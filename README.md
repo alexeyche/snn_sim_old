@@ -1,4 +1,4 @@
-snn_sim
+Snn Sim 
 =======
 
 Spiking neural network library and tools
