@@ -5,8 +5,8 @@ CWD=$(dirname $CWD_SCR)
 ulimit -c unlimited
 
 pushd $CWD &> /dev/null
-SNN_SIM="../bin/snn_sim"
-SNN_POSTPROC="../bin/snn_postproc"
+SNN_SIM="../build/bin/snn_sim"
+SNN_POSTPROC="../build/bin/snn_postproc"
 
 function usage {
     echo "$0 -m MODEL -e TEST_SPIKES -t TRAIN_SPIKES -r REPEATS -s SCHEME(METHOD)"

@@ -15,6 +15,7 @@ class RConstants {
 public:
     RConstants(std::string _const_filename) : const_filename(_const_filename) { 
         c = createConstants(const_filename.c_str());
+        if(!c) Rcpp::stop("Error while creating RConstants\n");
     }
     void print() {
         printConstants(c);

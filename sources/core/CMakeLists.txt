@@ -8,6 +8,7 @@ set(DIRS
     sim
     layers
     util
+    prep
     #    conn
 )
 

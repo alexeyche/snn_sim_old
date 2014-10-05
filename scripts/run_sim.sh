@@ -8,14 +8,14 @@ function usage {
     echo "$0 -w WORK_DIR -s -l -e EPOCHS -v TEST_SPIKES.BIN INPUT_FILE1 [INPUT_FILE2]"
 }
 function get_const_for_name {
-   grep -Eo "^$1.*=[ ]*[ \/_.a-zA-Z0-9]+" ../snn_sim/constants.ini | awk -F'=' '{ print $2}' | sed -e 's|^[ ]*||g' -e 's|[ ]*$||g'  | tr ' ' _
+   grep -Eo "^$1.*=[ ]*[ \/_.a-zA-Z0-9]+" ../constants.ini | awk -F'=' '{ print $2}' | sed -e 's|^[ ]*||g' -e 's|[ ]*$||g'  | tr ' ' _
 }
 
 ulimit -c unlimited
 
 pushd $CWD &> /dev/null
-SNN_SIM="../bin/snn_sim"
-SNN_POSTPROC="../bin/snn_postproc"
+SNN_SIM="../build/bin/snn_sim"
+SNN_POSTPROC="../build/bin/snn_postproc"
 RUNS_DIR=~/prog/sim/runs
 
 INPUT_FILES=
@@ -77,7 +77,7 @@ if [ "$AUTO" == "no" ]; then
                 break
             elif [ "$RESP" == "n" ]; then
                 rm -rf $WORK_DIR/*
-                cp ../snn_sim/constants.ini $WORK_DIR
+                cp ../constants.ini $WORK_DIR
                 break
             else 
                 read -p "$(basename $WORK_DIR) already exists and $LAST_EP epochs was done here. Continue learning? (y/n): " RESP
@@ -85,7 +85,7 @@ if [ "$AUTO" == "no" ]; then
         done        
     else 
         mkdir -p $WORK_DIR
-        cp ../snn_sim/constants.ini $WORK_DIR
+        cp ../constants.ini $WORK_DIR
     fi   
 fi
 

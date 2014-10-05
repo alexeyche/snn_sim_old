@@ -5,11 +5,11 @@
 #include <core/util/spikes_list.h>
 #include <core/util/io.h>
 #include <core/util/util.h>
+#include <core/prep/run.h>
 
 #include <core/constants.h>
 
 #include "prep_opts.h"
-#include "run.h"
 
 int main(int argc, char **argv) {
     ArgOptionsPrep a = parsePrepOptions(argc, argv);
