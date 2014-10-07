@@ -290,7 +290,10 @@ int file_handler(void* user, const char* section, const char* name, const char* 
         c->preproc->tc = tuningCurveParse(value);    
     } else 
     if (MATCH("preprocess", "max_curve_num")) {
-        c->preproc->max_curve_num = atof(value);    
+        c->preproc->max_curve_num = atoi(value);    
+    } else 
+    if (MATCH("preprocess", "prob_next_sigma")) {
+        c->preproc->prob_next_sigma = atof(value);    
     } else 
     if (MATCH("preprocess", "sigma")) {
         FILL_HIGH_AND_LOW_PARAM(c->preproc->sigma_low, c->preproc->sigma_high);
@@ -657,7 +660,8 @@ void PreprocessConstantsPrint(PreprocessConstants *c) {
     printf("N->"); size_tPrint(c->N);
     printf("dt->"); doublePrint(c->dt);
     printf("tc->"); tuning_curve_tPrint(c->tc);
-    printf("max_curve_num->"); doublePrint(c->max_curve_num);
+    printf("prob_next_sigma->"); doublePrint(c->prob_next_sigma);
+    printf("max_curve_num->"); size_tPrint(c->max_curve_num);
     printf("sigma_gain_low->"); doublePrint(c->sigma_gain_low);
     printf("sigma_gain_high->"); doublePrint(c->sigma_gain_high);
     printf("sigma_low->"); doublePrint(c->sigma_low);

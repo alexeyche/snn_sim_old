@@ -55,13 +55,13 @@ Rcpp::List MatrixVectorToRList(pMatrixVector *mv) {
 
 
 Rcpp::NumericMatrix DoublesAllocToRMatrix(double **v, int *sizes, int N) {
-    int max_size = -1;
+    size_t max_size = 0;
     for(size_t i=0; i<N; i++) {
-        if(max_size<sizes[i]) {
-            max_size = sizes[i];
-        }
+        max_size = max(sizes[i], max_size);
     }
-    assert(max_size>=0);
+    if(max_size == 0) {
+        Rcpp::stop("All double allocs is zero");
+    }
     Rcpp::NumericMatrix out(N, max_size);
     for(size_t i=0; i<N; i++) {
         for(size_t j=0; j<sizes[i]; j++) {
@@ -70,6 +70,24 @@ Rcpp::NumericMatrix DoublesAllocToRMatrix(double **v, int *sizes, int N) {
     }
     return out;
 }
+
+Rcpp::NumericMatrix DoubleVectorsToRMatrix(doubleVector **v, int N) {
+    size_t max_size = 0;
+    for(size_t i=0; i<N; i++) {
+        max_size = max(v[i]->size, max_size);
+    }
+    if(max_size == 0) {
+        Rcpp::stop("All doubleVectors is zero");
+    }
+    Rcpp::NumericMatrix out(N, max_size);
+    for(size_t i=0; i<N; i++) {
+        for(size_t j=0; j<v[i]->size; j++) {
+            out(i,j) = v[i]->array[j];
+        }
+    }
+    return out;
+}
+
 
 doubleVector *RNumericVectorToDoubleVector(Rcpp::NumericVector v) {
     doubleVector* ret = TEMPLATE(createVector,double)();

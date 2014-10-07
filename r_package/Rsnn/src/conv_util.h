@@ -21,5 +21,6 @@ SpikesList* RListToSpikesList(Rcpp::List l);
 doubleVector *RNumericVectorToDoubleVector(Rcpp::NumericVector v);
 pMatrixVector* RListToMatrixVector(Rcpp::List l);
 Matrix* RMatrixToMatrix(Rcpp::NumericMatrix m);
+Rcpp::NumericMatrix DoubleVectorsToRMatrix(doubleVector **v, int N);
 
 #endif

@@ -28,5 +28,6 @@ RCPP_MODULE(snnMod) {
     .method("run", &RPrepLayer::run, "Run time series through preparation layer")
     .method("getResponse", &RPrepLayer::getResponse, "Run prep layer thourgh one x value for certain time_limit")
     .method("getStat", &RPrepLayer::getStat, "Get statistics")
+    .method("getParams", &RPrepLayer::getParams, "Get params of tuning curves")
     ;
 }

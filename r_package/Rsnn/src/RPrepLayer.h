@@ -42,6 +42,14 @@ public:
         TEMPLATE(deleteVector,double)(resp);
         return v;
     }
+    Rcpp::List getParams() {
+        if(rc->c->preproc->tc == ESigmaTC) {
+            Rcpp::NumericMatrix centers = DoubleVectorsToRMatrix( ((SigmaTuningCurves*)tc)->centers, tc->N );
+            Rcpp::NumericMatrix sds = DoubleVectorsToRMatrix( ((SigmaTuningCurves*)tc)->sds, tc->N );
+            Rcpp::NumericMatrix gains = DoubleVectorsToRMatrix( ((SigmaTuningCurves*)tc)->gains, tc->N );
+            return Rcpp::List::create( Rcpp::Named("centers") = centers, Rcpp::Named("sds") = sds, Rcpp::Named("gains") = gains );
+        }
+    } 
     Rcpp::List getStat() {
         if(!saveStat) {
             Rcpp::stop("Need statLevel>0");

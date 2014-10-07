@@ -1,11 +1,17 @@
 #ifndef SIGMA_H
 #define SIGMA_H
 
+#include <snnlib/util/util.h>
+
 #include "tuning_curves.h"
 
 typedef struct SigmaTuningCurves {
     TuningCurves base;
 
+    doubleVector **centers;
+    doubleVector **sds;
+    doubleVector **gains;
+    char *encoder;
 } SigmaTuningCurves;
 
 

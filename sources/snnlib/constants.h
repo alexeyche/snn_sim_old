@@ -70,7 +70,8 @@ typedef struct {
     size_t N;
     double dt;
     tuning_curve_t tc;
-    double max_curve_num;
+    size_t max_curve_num;
+    double prob_next_sigma;
     double sigma_gain_low;
     double sigma_gain_high;
     double sigma_low;
