@@ -3,7 +3,7 @@
 
 #include <pthread.h>
 
-#include <core/util/matrix.h>
+#include <snnlib/util/matrix.h>
 
 
 typedef struct {

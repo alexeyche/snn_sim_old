@@ -34,6 +34,15 @@ Rcpp::NumericMatrix MatrixToRMatrix(Matrix *m) {
     return rm;
 }
 
+Matrix* RMatrixToMatrix(Rcpp::NumericMatrix m) {
+    Matrix *m_snn = createMatrix(m.nrow(), m.ncol());
+    for(size_t i=0; i<m_snn->nrow; i++) {
+        for(size_t j=0; j<m_snn->ncol; j++) {
+            setMatrixElement(m_snn, i, j, m(i,j));
+        }
+    }
+    return m_snn;
+}
 
 Rcpp::List MatrixVectorToRList(pMatrixVector *mv) {
     Rcpp::List l(mv->size);
@@ -42,6 +51,7 @@ Rcpp::List MatrixVectorToRList(pMatrixVector *mv) {
     }
     return l;
 }
+
 
 
 Rcpp::NumericMatrix DoublesAllocToRMatrix(double **v, int *sizes, int N) {
@@ -60,3 +70,40 @@ Rcpp::NumericMatrix DoublesAllocToRMatrix(double **v, int *sizes, int N) {
     }
     return out;
 }
+
+doubleVector *RNumericVectorToDoubleVector(Rcpp::NumericVector v) {
+    doubleVector* ret = TEMPLATE(createVector,double)();
+    for(size_t i=0; i<v.size(); i++) {
+        TEMPLATE(insertVector,double)(ret, v[i]);
+    }
+    return ret;
+}
+
+
+Rcpp::NumericVector DoubleVectorToRNumericVector(doubleVector *v) {
+    Rcpp::NumericVector ret(v->size);
+    for(size_t i=0; i<v->size; i++) {
+        ret(i) = v->array[i];
+    }
+    return ret;
+}
+
+pMatrixVector* RListToMatrixVector(Rcpp::List l) {
+    pMatrixVector *v = TEMPLATE(createVector,pMatrix)();
+    for(size_t i=0; i<l.size(); i++) {
+        Rcpp::NumericMatrix m = l[i];
+        Matrix *m_snn = RMatrixToMatrix(m); 
+        TEMPLATE(insertVector,pMatrix)(v, m_snn);
+    }
+    return v;
+}
+
+Rcpp::List SpikePatternsListToRList(SpikePatternsList *spl) {
+    Rcpp::List l(3);    
+    l(0) = SpikesListToRList(spl->sl);
+    l(1) = DoubleVectorToRNumericVector(spl->timeline);
+    l(2) = DoubleVectorToRNumericVector(spl->pattern_classes);
+    return l;
+}
+
+

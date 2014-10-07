@@ -8,6 +8,7 @@
 .onLoad <- function(pkgname, libname) {
     assign("RSim", Module("snnMod")$RSim, envir=parent.env(environment()))
     assign("RConstants", Module("snnMod")$RConstants, envir=parent.env(environment()))
+    assign("RPrepLayer", Module("snnMod")$RPrepLayer, envir=parent.env(environment()))
     setMethod( "show", RSim, function(object) {
         object$print()    
     } )

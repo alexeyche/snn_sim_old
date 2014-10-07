@@ -3,7 +3,7 @@
 
 #include "RConstants.h"
 #include "RSim.h"
-
+#include "RPrepLayer.h"
 
 RCPP_MODULE(snnMod) {
     Rcpp::class_<RSim>("RSim")
@@ -22,5 +22,11 @@ RCPP_MODULE(snnMod) {
     .field("const_filename", &RConstants::const_filename, "Constants filename")
     .method("setValue", &RConstants::setValue, "Set value of constant with section and name")
     .method("print", &RConstants::print, "Print constants")
+    ;
+    Rcpp::class_<RPrepLayer>("RPrepLayer")
+    .constructor<RConstants*,unsigned char, size_t>()
+    .method("run", &RPrepLayer::run, "Run time series through preparation layer")
+    .method("getResponse", &RPrepLayer::getResponse, "Run prep layer thourgh one x value for certain time_limit")
+    .method("getStat", &RPrepLayer::getStat, "Get statistics")
     ;
 }

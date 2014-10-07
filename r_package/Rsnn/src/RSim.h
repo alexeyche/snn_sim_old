@@ -7,7 +7,7 @@
 #include "conv_util.h"
 
 extern "C" {
-    #include <core/sim/sim.h>
+    #include <snnlib/sim/sim.h>
 }
 
 

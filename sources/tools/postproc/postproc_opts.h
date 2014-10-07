@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <core/util/util_vector.h>
-#include <core/util/matrix.h>
+#include <snnlib/util/util_vector.h>
+#include <snnlib/util/matrix.h>
 
 
 typedef struct {

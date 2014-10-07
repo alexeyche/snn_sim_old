@@ -3,9 +3,9 @@
 
 
 
-#include <core/util/spikes_list.h>
-#include <core/util/matrix.h>
-#include <core/util/io.h>
+#include <snnlib/util/spikes_list.h>
+#include <snnlib/util/matrix.h>
+#include <snnlib/util/io.h>
 
 #include <math.h>
 #include <float.h>

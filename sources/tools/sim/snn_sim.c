@@ -1,12 +1,12 @@
 #define _POSIX_C_SOURCE 200809L
 
 
-#include <core/core.h>
+#include <snnlib/core.h>
 
-#include <core/sim/sim.h>
-#include <core/sim/serialize.h>
-#include <core/util/io.h>
-#include <core/util/spikes_list.h>
+#include <snnlib/sim/sim.h>
+#include <snnlib/sim/serialize.h>
+#include <snnlib/util/io.h>
+#include <snnlib/util/spikes_list.h>
 
 
 #include "sim_opts.h"

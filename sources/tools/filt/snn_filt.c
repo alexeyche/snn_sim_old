@@ -1,11 +1,11 @@
 
 
-#include <core/core.h>
+#include <snnlib/core.h>
 
 
-#include <core/util/spikes_list.h>
-#include <core/util/io.h>
-#include <core/util/util.h>
+#include <snnlib/util/spikes_list.h>
+#include <snnlib/util/io.h>
+#include <snnlib/util/util.h>
 
 #include "filt_funcs.h"
 #include "optim_lbfgs.h"

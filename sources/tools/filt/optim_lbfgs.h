@@ -1,7 +1,7 @@
 #ifndef OPTIM_LBFGS_H
 #define OPTIM_LBFGS_H
 
-#include <core/util/matrix.h>
+#include <snnlib/util/matrix.h>
 
 #include <lbfgs.h>
 

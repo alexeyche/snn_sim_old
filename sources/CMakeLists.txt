@@ -28,7 +28,6 @@ if(DEBUG)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99 -g -O0")
 else()
-  add_definitions(-DARMA_NO_DEBUG)
   add_definitions(-DNDEBUG)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99 -O3")
@@ -52,6 +51,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 include_directories(${CMAKE_SOURCE_DIR})
 
 # Recurse into the rest of the project.
-add_subdirectory(core)
+add_subdirectory(snnlib)
 add_subdirectory(tools)
 

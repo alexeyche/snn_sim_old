@@ -4,7 +4,7 @@
 #include <Rcpp.h>
 
 extern "C" {
-    #include <core/constants.h>
+    #include <snnlib/constants.h>
 }
 
 

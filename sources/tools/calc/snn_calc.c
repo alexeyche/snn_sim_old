@@ -1,9 +1,9 @@
 
 
-#include <core/core.h>
+#include <snnlib/core.h>
 
-#include <core/util/io.h>
-#include <core/util/matrix.h>
+#include <snnlib/util/io.h>
+#include <snnlib/util/matrix.h>
 #include <math.h>
 
 #include "calc.h"

@@ -1,13 +1,13 @@
-#include <core/core.h>
+#include <snnlib/core.h>
 #include <time.h>
 
 
-#include <core/util/spikes_list.h>
-#include <core/util/io.h>
-#include <core/util/util.h>
-#include <core/prep/run.h>
+#include <snnlib/util/spikes_list.h>
+#include <snnlib/util/io.h>
+#include <snnlib/util/util.h>
+#include <snnlib/prep/run.h>
 
-#include <core/constants.h>
+#include <snnlib/constants.h>
 
 #include "prep_opts.h"
 
@@ -25,8 +25,12 @@ int main(int argc, char **argv) {
 
     doubleVector *ts_labels = doubleVectorFromMatrix(ts_labels_m->array[0]);
 
-    SpikePatternsList *spl = runNeurons(ts_data, ts_labels, c, false);
+    AdExLayer *l = createAdExLayer(c->preproc->N, false);
+    TuningCurves *tc = initTuningCurves(c);
+    SpikePatternsList *spl = runNeurons(l, tc, ts_data, ts_labels, c);
     saveSpikePatternsListToFile(spl, a.output_file);
-     
+    
+    tc->free(tc);
+    deleteAdExLayer(l);        
     return(0.0);
 } 
