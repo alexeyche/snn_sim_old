@@ -8,6 +8,8 @@ SpikesList* createSpikesList(size_t size_) {
     for(size_t li=0; li<sl->size; li++) {
         sl->list[li] = TEMPLATE(createVector,double)();
     }
+    sl->Tmax = 0;
+    sl->dt = 0;
     return(sl);
 }
 
@@ -64,6 +66,23 @@ Matrix* spikesListToSpikesMatrix(SpikesList *sl) {
     return(m);
 }
 
+Matrix* spikesListToBinarySpikesMatrix(SpikesList *sl) {
+    if( (sl->Tmax == 0.0) && (sl->dt == 0.0) ) {
+        printf("Need use spikesListToBinarySpikesMatrix function only with filled Tmax and dt in SpikesList instance\n");
+        exit(1);
+    }
+    Matrix *m = createZeroMatrix(sl->size, ceil(sl->Tmax/sl->dt));
+    for(size_t ni=0; ni<sl->size; ni++) {
+        for(size_t sp_i=0; sp_i<sl->list[ni]->size; sp_i++) {
+            size_t spike_ind = sl->list[ni]->array[sp_i]/sl->dt;
+//            printf("%f -> %zu\n", sl->list[ni]->array[sp_i], spike_ind);
+            setMatrixElement(m, ni, spike_ind, 1.0);
+        }
+    }
+    return(m);
+}
+
+
 SpikePatternsList* createSpikePatternsList(size_t n) {
     SpikePatternsList* spl = (SpikePatternsList*) malloc( sizeof(SpikePatternsList) );
     spl->sl = createSpikesList(n);
@@ -71,6 +90,8 @@ SpikePatternsList* createSpikePatternsList(size_t n) {
     spl->pattern_classes = TEMPLATE(createVector,double)();
     return(spl);
 }
+
+
 
 void deleteSpikePatternsList(SpikePatternsList *spl) {
     deleteSpikesList(spl->sl);
@@ -100,11 +121,17 @@ SpikePatternsList* readSpikePatternsListFromFile(const char *filename) {
     return(spl);
 }
 
-void saveSpikePatternsListToFile(SpikePatternsList *spl, const char *filename) {
-    Matrix *sp = spikesListToSpikesMatrix(spl->sl);
+void saveSpikePatternsListToFile(SpikePatternsList *spl, const char *filename, bool binary_spikes) {
+    Matrix *sp;
+    if(binary_spikes) {
+        sp = spikesListToBinarySpikesMatrix(spl->sl);
+    } else {
+        sp = spikesListToSpikesMatrix(spl->sl);
+    }        
     Matrix *timeline = vectorArrayToMatrix(&spl->timeline, 1);
     Matrix *pattern_classes  = vectorArrayToMatrix(&spl->pattern_classes, 1);
     pMatrixVector *ml = TEMPLATE(createVector,pMatrix)();
+
     TEMPLATE(insertVector,pMatrix)(ml, sp);
     TEMPLATE(insertVector,pMatrix)(ml, timeline);
     TEMPLATE(insertVector,pMatrix)(ml, pattern_classes);

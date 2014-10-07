@@ -10,6 +10,8 @@
 typedef struct {
     doubleVector **list;
     size_t size;
+    double dt;
+    double Tmax;
 } SpikesList;
 
 typedef struct {
@@ -17,6 +19,7 @@ typedef struct {
     doubleVector *timeline;
     doubleVector *pattern_classes;
 } SpikePatternsList;
+
 
 SpikesList* createSpikesList(size_t size_);
 void readSpikesFromMatrix(SpikesList *sl, Matrix *m);
@@ -27,7 +30,7 @@ Matrix* spikesListToSpikesMatrix(SpikesList *sl);
 
 SpikePatternsList* createSpikePatternsList(size_t n);
 SpikePatternsList* readSpikePatternsListFromFile(const char *filename);
-void saveSpikePatternsListToFile(SpikePatternsList *spl, const char *filename);
 void deleteSpikePatternsList(SpikePatternsList *spl);
+void saveSpikePatternsListToFile(SpikePatternsList *spl, const char *filename, bool binary_spikes);
 
 #endif

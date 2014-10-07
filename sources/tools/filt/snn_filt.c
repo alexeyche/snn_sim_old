@@ -25,7 +25,10 @@ int main(int argc, char **argv) {
 
     Matrix *spike_data = ts_data->array[0];
     doubleVector *target = doubleVectorFromMatrix(target_data->array[0]);
-    assert(spike_data->ncol == target->size);
+    if(spike_data->ncol != target->size) {
+        printf("Spikes data do not equals target data %zu != %zu\n", spike_data->ncol, target->size);
+        exit(1);
+    }
 
     Matrix *w_opt = runLbfgsOptim(spike_data, target, a.filter_size, a.jobs, a.epsilon);
 

@@ -18,6 +18,7 @@ void usageFilt(void) {
     printf("\t-i - file for input spikes\n");
     printf("\t-t - file for target values\n");
     printf("\t-l - size of filter window\n");
+    printf("\t-j - jobs\n");
     printf("\t-o - file for output\n");
     printf("\t-e - epsilon\n");
     printf("\t-? - print this message\n");

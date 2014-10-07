@@ -63,6 +63,8 @@ SpikePatternsList* runNeurons(AdExLayer *l, TuningCurves *tc, pMatrixVector *ts_
         TEMPLATE(insertVector,double)(spl->timeline, t);
         TEMPLATE(insertVector,double)(spl->pattern_classes, ts_labels->array[ts_indices->array[ts_i] ]);
     }
+    spl->sl->Tmax = t;
+    spl->sl->dt = c->preproc->dt;
     return(spl);
 }
 

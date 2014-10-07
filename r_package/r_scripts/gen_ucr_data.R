@@ -31,10 +31,12 @@ if(!file.exists(sprintf("%s.bin", train_fname))) {
     }
     #write.table(train_dataset_inter,file=fname,sep=" ", col.names = F, row.names = F, append=F)
     saveMatrixList(train_fname, train_dataset_inter_bin)
+    saveMatrixList(sprintf("%s_cat", train_fname), list(matrix(unlist(train_dataset_inter_bin), ncol=1)))
     saveMatrixList(sprintf("%s_labels", train_fname), list(matrix(sapply(train_dataset, function(x) x$label))) )
 
     #write.table(test_dataset_inter,file=fname,sep=" ", col.names = F, row.names = F)
     saveMatrixList(test_fname, test_dataset_inter_bin)
+    saveMatrixList(sprintf("%s_cat", test_fname), list(matrix(unlist(test_dataset_inter_bin), ncol=1)))
     saveMatrixList(sprintf("%s_labels", test_fname), list(matrix(sapply(test_dataset, function(x) x$label))) )
 }
 

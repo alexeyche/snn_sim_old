@@ -27,8 +27,9 @@ int main(int argc, char **argv) {
 
     AdExLayer *l = createAdExLayer(c->preproc->N, false);
     TuningCurves *tc = initTuningCurves(c);
+
     SpikePatternsList *spl = runNeurons(l, tc, ts_data, ts_labels, c);
-    saveSpikePatternsListToFile(spl, a.output_file);
+    saveSpikePatternsListToFile(spl, a.output_file, a.binary_spikes);
     
     tc->free(tc);
     deleteAdExLayer(l);        
