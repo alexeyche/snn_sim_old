@@ -3,5 +3,5 @@
 
 <p>Straighforward and naive implementation of spiking neural networks. <br  />
 Multithreaded, fast but buggy</p>
-Project have a dependencies: <br  />
+Project have dependency: <br  />
 http://www.chokkan.org/software/liblbfgs/
