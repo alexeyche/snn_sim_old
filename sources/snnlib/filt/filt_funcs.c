@@ -44,6 +44,15 @@ void *error_grad_routine(void *args) {
     return(NULL);
 }
 
+void *conv_routine(void *args) {
+    FiltWorker *fw = (FiltWorker*)args;
+    fw->reconstructed = TEMPLATE(createVector,double)();
+    for(size_t i=fw->first; i<fw->last; i++) {
+        double t_w = conv(i, fw->y, fw->w); 
+        TEMPLATE(insertVector,double)(fw->reconstructed, t_w);
+    }    
+}
+
 double calcError(Matrix *y, Matrix *w, doubleVector *target, int jobs) {
     assert(y->ncol == target->size);
 
@@ -118,3 +127,34 @@ Matrix* calcErrorGrad(Matrix *y, Matrix *w, doubleVector *target, int jobs) {
 
     return dedw;
 }
+
+
+doubleVector* calcConv(Matrix *y, Matrix *w, doubleVector *target, int jobs) {
+    assert(y->ncol == target->size);
+
+    pthread_t *threads = (pthread_t *) malloc( jobs * sizeof( pthread_t ) );
+    FiltWorker *workers = (FiltWorker*) malloc( jobs * sizeof(FiltWorker) );
+    
+    for(size_t wi=0; wi < jobs; wi++) {
+        int points_per_thread = (y->ncol + jobs - 1) / jobs;
+        workers[wi].first = min( wi    * points_per_thread, y->ncol );
+        workers[wi].last  = min( (wi+1) * points_per_thread, y->ncol );
+        workers[wi].y = y;
+        workers[wi].w = w;
+        workers[wi].target = target;
+    }
+    for( int i = 0; i < jobs; i++ )  {
+        P( pthread_create( &threads[i], NULL, conv_routine,  &workers[i]) );
+    }
+    for( int i = 0; i < jobs; i++ )  {
+        P( pthread_join( threads[i], NULL) );
+    }
+    doubleVector *reconstructed = TEMPLATE(createVector,double)();
+    for( size_t wi=0; wi< jobs; wi++) {
+        for(size_t i=0; i < workers[wi].reconstructed->size; i++) {
+            TEMPLATE(insertVector,double)(reconstructed, workers[wi].reconstructed->array[i]);
+        }
+    }
+    return(reconstructed);
+}
+

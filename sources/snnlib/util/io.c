@@ -28,9 +28,9 @@ pMatrixVector* readMatrixListFromFile(const char *fname) {
 }
 
 pMatrixVector* readMatrixList(FileStream *f, int num_to_read) {
-    if(f == NULL) {
+    if((f == NULL)||(f->fd == NULL)) {
         printf("Error in opening file %s\n", f->fname);
-        return(NULL);
+        exit(1);
     }
     pMatrixVector *mlist = TEMPLATE(createVector,pMatrix)();
     int matrix_read = 0;
@@ -60,6 +60,16 @@ pMatrixVector* readMatrixList(FileStream *f, int num_to_read) {
         
         if(strcmp(type, "double") == 0) {
             Matrix *m = createMatrix(i, j); 
+            if(fread(m->vals, sizeof(double), i*j, f->fd) != i*j) {
+                printf("Error while reading matrix in matrix list file %s\n", f->fname);
+                break;
+            }
+            TEMPLATE(insertVector,pMatrix)(mlist, m);
+            matrix_read += 1; 
+        } else 
+        if(strcmp(type, "double:t") == 0) {
+            Matrix *m = createMatrix(i, j); 
+            m->transposed = true;
             if(fread(m->vals, sizeof(double), i*j, f->fd) != i*j) {
                 printf("Error while reading matrix in matrix list file %s\n", f->fname);
                 break;
@@ -114,12 +124,15 @@ void saveMatrixList(FileStream *f, pMatrixVector *mv) {
     char* idx_fname = getIdxName(f->fname);
     FILE *f_idx = fopen(idx_fname, "ab");    
     
-    const char *type_name = "double";
     for(size_t mi=0; mi < mv->size; mi++) {
+        Matrix *m = mv->array[mi];        
+        char *type_name = "double";
+        if(m->transposed) {
+            type_name = "double:t";
+        }
         int pos = ftell(f->fd);
         fwrite(&pos, sizeof(int), 1, f_idx);
 
-        Matrix *m = mv->array[mi];        
         fwrite(&m->nrow, sizeof(unsigned int), 1, f->fd);
         fwrite(&m->ncol, sizeof(unsigned int), 1, f->fd);   
         fwrite(type_name, sizeof(char), strlen(type_name)+1, f->fd);

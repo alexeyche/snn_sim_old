@@ -13,6 +13,7 @@ Matrix *createMatrix(size_t nr, size_t nc) {
     m->nrow = nr;
     m->ncol = nc;
     m->vals = (double*)malloc(m->nrow*m->ncol*sizeof(double));
+    m->transposed = false;
     return(m);
 }
 
@@ -45,11 +46,14 @@ Matrix *createNormMatrix(size_t nr, size_t nc) {
 }
 
 void transposeMatrix(Matrix *m) {
-    for(size_t i=0; i<m->nrow; i++) {
-        for(size_t j=0; j<m->nrow; j++) {
-            setMatrixElement(m, i, j, getMatrixElement(m, j, i));
-        }
+    if(m->transposed == false) {
+        m->transposed = true;
+    } else {
+        m->transposed = false;
     }
+    size_t b = m->ncol;
+    m->ncol = m->nrow;
+    m->nrow = b;
 }
 
 void deleteMatrix(Matrix *m) {
@@ -58,9 +62,11 @@ void deleteMatrix(Matrix *m) {
 }
 
 void setMatrixElement(Matrix *m, size_t i, size_t j, double val) {
+    TRANSPOSE_IND
     m->vals[j*m->nrow + i] = val;
 }
 double getMatrixElement(Matrix *m, size_t i, size_t j) {
+    TRANSPOSE_IND
     return m->vals[j*m->nrow + i];
 }
 

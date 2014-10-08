@@ -14,7 +14,16 @@ typedef struct {
     double *vals;
     size_t nrow;
     size_t ncol;
+    bool transposed;
 } Matrix;
+
+#define TRANSPOSE_IND { \
+    if(m->transposed) { \
+        size_t b = i;\
+        i=j;\
+        j=b;\
+    }\
+}\
 
 typedef Matrix* pMatrix;
 

@@ -8,7 +8,7 @@ saveStat = TRUE
 const = RConstants$new(const_ini)
 const$setValue("preprocess","tuning_curve", "LinearTC")
 const$setValue("preprocess","rate", "25:200")
-const$setValue("preprocess","N", 1)
+const$setValue("preprocess","N", 100)
 const$setValue("adex neuron", "t_ref", 2.0)
 
 const$setValue("adex neuron", "slope", 0.0)

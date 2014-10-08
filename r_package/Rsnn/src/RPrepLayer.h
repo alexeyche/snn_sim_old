@@ -48,6 +48,20 @@ public:
             Rcpp::NumericMatrix sds = DoubleVectorsToRMatrix( ((SigmaTuningCurves*)tc)->sds, tc->N );
             Rcpp::NumericMatrix gains = DoubleVectorsToRMatrix( ((SigmaTuningCurves*)tc)->gains, tc->N );
             return Rcpp::List::create( Rcpp::Named("centers") = centers, Rcpp::Named("sds") = sds, Rcpp::Named("gains") = gains );
+        } else 
+        if(rc->c->preproc->tc == ELinearTC) {
+            Rcpp::NumericVector encoder(tc->N);
+            Rcpp::NumericVector gain(tc->N);
+            Rcpp::NumericVector bias(tc->N);
+            LinearTuningCurves* lts = (LinearTuningCurves*)tc;
+            for(size_t ni=0; ni<tc->N; ni++) {
+                encoder(ni) = lts->encoder[ni];
+                gain(ni) = lts->gain[ni];
+                bias(ni) = lts->bias[ni];
+            }                
+            return Rcpp::List::create( Rcpp::Named("gain") = gain, Rcpp::Named("gain") = gain, Rcpp::Named("encoder") = encoder );
+        } else {
+            Rcpp::stop("Unknown tuning curve type");
         }
     } 
     Rcpp::List getStat() {

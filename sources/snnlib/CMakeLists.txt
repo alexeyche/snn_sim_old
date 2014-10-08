@@ -9,6 +9,7 @@ set(DIRS
     layers
     util
     prep
+    filt
     #    conn
 )
 

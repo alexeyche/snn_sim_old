@@ -46,6 +46,16 @@ loadMatrix <- function(baseName = "data", index) {
     seek(con, offset)
     d <- readBin(con, 'integer', 2)
     type <- readBin(con, 'character', 1)
+    if(type == "double:t") {
+        type = "double"
+        b = d[1] 
+        d[1] = d[2]
+        d[2] = b
+        m = t(structure(readBin(con, type, prod(d)), dim=d))
+    } else {
+        m = structure(readBin(con, type, prod(d)), dim=d)
+    }
+
     close(idxCon)
-    return(structure(readBin(con, type, prod(d)), dim=d))
+    return(m)
 }

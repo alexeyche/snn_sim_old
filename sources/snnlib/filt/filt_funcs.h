@@ -13,6 +13,7 @@ typedef struct {
     Matrix *w;
     Matrix *y;
     doubleVector *target;
+    doubleVector *reconstructed;
 
     Matrix *dedw;
 } FiltWorker;
@@ -22,9 +23,10 @@ double conv(size_t i, Matrix *y, Matrix *w);
 
 void *error_routine(void *args);
 void *error_grad_routine(void *args);
+void *conv_routine(void *args);
 
 double calcError(Matrix *y, Matrix *w, doubleVector *target, int jobs);
 Matrix* calcErrorGrad(Matrix *y, Matrix *w, doubleVector *target, int jobs);
-
+doubleVector* calcConv(Matrix *y, Matrix *w, doubleVector *target, int jobs);
 
 #endif

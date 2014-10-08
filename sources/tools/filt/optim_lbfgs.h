@@ -2,10 +2,10 @@
 #define OPTIM_LBFGS_H
 
 #include <snnlib/util/matrix.h>
+#include <snnlib/filt/filt_funcs.h>
 
 #include <lbfgs.h>
 
-#include "filt_funcs.h"
 
 typedef struct {
     Matrix *y;
