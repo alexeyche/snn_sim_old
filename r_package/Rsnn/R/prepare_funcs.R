@@ -10,7 +10,7 @@ plot_tuning_curves = function(prep_layer) {
     cols = rainbow(nrow(resp))
     for(ni in 1:nrow(resp)) {
         if(ni==1) {
-            plot(x, resp[ni,], type="l", col=cols[ni], ylim=c(min(resp), max(resp)))
+            plot(x, resp[ni,], type="l", col=cols[ni], ylim=c(min(resp), max(resp)), xlab="value",ylab="Hz")
         } else {
             lines(x, resp[ni,], col=cols[ni])
         }
