@@ -23,7 +23,11 @@ SigmaTuningCurves* init_SigmaTuningCurves(const Constants *c) {
         tc->gains[ni] = TEMPLATE(createVector,double)();
         for(size_t ci=0; ci < c->preproc->max_curve_num; ci++) {
             if((ci>0) && (c->preproc->prob_next_sigma < getUnif() )) break;
-            TEMPLATE(insertVector,double)(tc->centers[ni], getUnifBetween(c->preproc->intercept_low, c->preproc->intercept_high));
+            if(c->preproc->max_curve_num > 1) {
+                TEMPLATE(insertVector,double)(tc->centers[ni], getUnifBetween(c->preproc->intercept_low, c->preproc->intercept_high));
+            } else {
+                TEMPLATE(insertVector,double)(tc->centers[ni], c->preproc->intercept_low + ((double)ni/tc->base.N)*(c->preproc->intercept_high-c->preproc->intercept_low));
+            }
             TEMPLATE(insertVector,double)(tc->sds[ni],     getUnifBetween(c->preproc->sigma_low, c->preproc->sigma_high));
             TEMPLATE(insertVector,double)(tc->gains[ni],   getUnifBetween(c->preproc->sigma_gain_low, c->preproc->sigma_gain_high));
         }

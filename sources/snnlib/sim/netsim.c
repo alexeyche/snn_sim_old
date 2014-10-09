@@ -89,6 +89,7 @@ int compSynSpike( const void *elem1, const void *elem2 ) {
 void propagateInputSpikesNetSim(Sim *s, SpikesList *sl) {
     NetSim *ns = s->ns;
     
+    printf("%zu %zu\n", ns->size, sl->size);
     assert(ns->size >= sl->size);
 
     SynSpikeVector **input_spikes = (SynSpikeVector**) malloc( ns->size * sizeof(SynSpikeVector*));

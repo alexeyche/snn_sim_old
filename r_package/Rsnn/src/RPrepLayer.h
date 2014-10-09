@@ -23,11 +23,11 @@ public:
         deleteAdExLayer(l);
     }
 
-    Rcpp::List run(Rcpp::List ts_data, Rcpp::NumericVector ts_labels) {
+    Rcpp::List run(Rcpp::List ts_data, Rcpp::NumericVector ts_labels, double gap_between_patterns = 0.0) {
         doubleVector *ts_labels_snn = RNumericVectorToDoubleVector(ts_labels);        
         pMatrixVector *ts_data_snn = RListToMatrixVector(ts_data);
 
-        SpikePatternsList* spl = runNeurons(l, tc, ts_data_snn, ts_labels_snn, rc->c);
+        SpikePatternsList* spl = runNeurons(l, tc, ts_data_snn, ts_labels_snn, rc->c, gap_between_patterns);
         
         TEMPLATE(deleteVector,double)(ts_labels_snn);            
         TEMPLATE(deleteVector,pMatrix)(ts_data_snn);

@@ -16,6 +16,7 @@ typedef struct {
     const char *output_file;
     const char *stat_file;
     bool binary_spikes;
+    double gap_between_patterns;
 } ArgOptionsPrep;
 
 
@@ -27,6 +28,7 @@ void usagePrep(void) {
     printf("\t-o - file for output spikes\n");
     printf("\t-s - file for statistics\n");
     printf("\t-b - binary spikes\n");
+    printf("\t-g - gap between patterns\n");
     printf("\t-? - print this message\n");
     exit(8);
 }
@@ -40,10 +42,19 @@ ArgOptionsPrep parsePrepOptions(int argc, char **argv) {
     args.input_labels_file = NULL;
     args.stat_file = NULL;
     args.binary_spikes = false;
+    args.gap_between_patterns = 0.0;
     if(argc == 1) usagePrep();
     while ((argc > 1) && (argv[1][0] == '-')) {
         if(strcmp(argv[1], "-b") == 0) {                
             args.binary_spikes = true;
+        } else
+        if(strcmp(argv[1], "-g") == 0) {                
+            if(argc == 2) { 
+                printf("No options for -g\n");
+                usagePrep();
+            }
+            args.gap_between_patterns = atof(argv[2]);
+            ++argv; --argc;
         } else
         if(strcmp(argv[1], "-s") == 0) {                
             if(argc == 2) { 

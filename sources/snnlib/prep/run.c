@@ -34,7 +34,7 @@ doubleVector* computeResponse(TuningCurves *tc, double x, double time_limit, con
     return(resp);
 }
 
-SpikePatternsList* runNeurons(AdExLayer *l, TuningCurves *tc, pMatrixVector *ts_data, doubleVector *ts_labels, Constants *c) {
+SpikePatternsList* runNeurons(AdExLayer *l, TuningCurves *tc, pMatrixVector *ts_data, doubleVector *ts_labels, Constants *c, double t_gap) {
     indVector *ts_indices = TEMPLATE(createVector,ind)();
     for(size_t ti=0; ti< ts_data->size; ti++) {
         TEMPLATE(insertVector,ind)(ts_indices, ti);    
@@ -60,6 +60,7 @@ SpikePatternsList* runNeurons(AdExLayer *l, TuningCurves *tc, pMatrixVector *ts_
                 }
             }
         }
+        t += t_gap;
         TEMPLATE(insertVector,double)(spl->timeline, t);
         TEMPLATE(insertVector,double)(spl->pattern_classes, ts_labels->array[ts_indices->array[ts_i] ]);
     }

@@ -15,6 +15,6 @@
 TuningCurves* initTuningCurves(const Constants *c);
 
 doubleVector* computeResponse(TuningCurves *tc, double x, double time_limit, const Constants *c);
-SpikePatternsList* runNeurons(AdExLayer *l, TuningCurves *tc, pMatrixVector *ts_data, doubleVector *ts_labels, Constants *c);
+SpikePatternsList* runNeurons(AdExLayer *l, TuningCurves *tc, pMatrixVector *ts_data, doubleVector *ts_labels, Constants *c, double t_gap);
 
 #endif
