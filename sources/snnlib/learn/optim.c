@@ -98,7 +98,7 @@ void trainWeightsStep_OptimalSTDP(learn_t *ls_t, const double *u, const double *
             double p_stroke = l->prob_fun_stroke(u,c);
             double dC = C_calc( &l->fired[ *ni ], p, &p_stroke, u, M, &l->syn[ *ni ][ *syn_id ], c); // * l->syn_spec[ *ni ][ *syn_id ];
             ls->C[ *ni ][ *syn_id ] += -ls->C[ *ni ][ *syn_id ]/c->tc + dC;
-    //                printf("dC: %f C: %f, params: %d %f %f %f %f\n", dC, l->C[ *ni ][ *syn_id ], l->fired[ *ni ], p, u, l->syn[ *ni ][ *syn_id ], M);
+//                    printf("dC: %f C: %f, params: %d %f %f %f %f\n", dC, ls->C[ *ni ][ *syn_id ], l->fired[ *ni ], p, u, l->syn[ *ni ][ *syn_id ], M);
             
 #if RATE_NORM == PRESYNAPTIC
             double dw = getLC(l,c)->lrate*( ls->C[ *ni ][ *syn_id ]*ls->B[ *ni ] -  \
@@ -224,7 +224,6 @@ void saveStat_OptimalSTDP(learn_t *ls_t, pMatrixVector *mv) {
     LayerPoisson *l = ls->base.l; 
     
     if(l->stat->statLevel>1) {
-        pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
         Matrix *mB = vectorArrayToMatrix(ls->stat_B, l->N);
 
         TEMPLATE(insertVector,pMatrix)(mv, mB);
