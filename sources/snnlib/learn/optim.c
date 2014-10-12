@@ -65,9 +65,10 @@ void propagateSynSpike_OptimalSTDP(learn_t *ls_t, const size_t *ni, const SynSpi
 }
 
 double B_calc(const unsigned char *Yspike, const double *p, const double *pmean, const Constants *c) {
-    if( fabs(*pmean - 0.0) < 0.0000001 ) return(0);
+    if( fabs(*pmean - 0.0) < 0.00001 ) return(0);
     double pmean_w = *pmean/c->mean_p_dur;
 //    printf("pmean_w %f, 1part: %f, 2part: %f\n", pmean_w, ( *Yspike * log( *p/pmean_w) - (*p - pmean_w)), c->target_rate_factor * ( *Yspike * log( pmean_w/c->__target_rate) - (pmean_w - c->__target_rate) ));
+//    printf("yspike:%d pL%f pmean:%f log:%f\n", *Yspike, *p, pmean_w, log( *p/pmean_w));
     return (( *Yspike * log( *p/pmean_w) - (*p - pmean_w)) - c->target_rate_factor * ( *Yspike * log( pmean_w/c->__target_rate) - (pmean_w - c->__target_rate) ));
 
 }
