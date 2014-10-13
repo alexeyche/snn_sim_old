@@ -24,6 +24,9 @@ OptimalSTDP* init_OptimalSTDP(LayerPoisson *l) {
         ls->C[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
         ls->pacc[ni] = 0;
         ls->eligibility_trace[ni] = 0;
+        for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
+            ls->C[ni][con_i] = 0.0;
+        }
         if(l->stat->statLevel>1) {
             ls->stat_B[ni] = TEMPLATE(createVector,double)();
             ls->stat_C[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
@@ -91,39 +94,23 @@ void trainWeightsStep_OptimalSTDP(learn_t *ls_t, const double *u, const double *
 
         indLNode *act_node = NULL;
         while( (act_node = TEMPLATE(getNextLList,ind)(ls->learn_syn_ids[ *ni ]) ) != NULL ) {
-    //            for(size_t con_i=0; con_i < l->nconn[ *ni ]; con_i++) {
-    //                const size_t *syn_id = &con_i;
             const size_t *syn_id = &act_node->value;
 
-    //                if( (l->C[ *ni ][ *syn_id ] == 0) && (l->syn[ *ni ][ *syn_id ] == 0) ) continue;
             double p_stroke = l->prob_fun_stroke(u,c);
             double dC = C_calc( &l->fired[ *ni ], p, &p_stroke, u, M, &l->syn[ *ni ][ *syn_id ], c); // * l->syn_spec[ *ni ][ *syn_id ];
             ls->C[ *ni ][ *syn_id ] += -ls->C[ *ni ][ *syn_id ]/c->tc + dC;
-//            if(*syn_id == 47) {
-//                printf("dC: %f C: %f, params: %d %f %f %f %f\n", dC, ls->C[ *ni ][ *syn_id ], l->fired[ *ni ], *p, *u, l->syn[ *ni ][ *syn_id ], *M);
-//            }
+//            printf("dC: %f C: %f, params: %d %f %f %f %f\n", dC, ls->C[ *ni ][ *syn_id ], l->fired[ *ni ], *p, *u, l->syn[ *ni ][ *syn_id ], *M);
             
-#if RATE_NORM == PRESYNAPTIC
             double dw = getLC(l,c)->lrate*( ls->C[ *ni ][ *syn_id ]*ls->B[ *ni ] -  \
                                         getLC(l,c)->weight_decay_factor * l->syn_fired[ *ni ][ *syn_id ] * l->W[ *ni ][ *syn_id ] );
-#elif RATE_NORM == POSTSYNAPTIC                
-            double dw = getLC(l,c)->lrate*( l->C[ *ni ][ *syn_id ]*l->B[ *ni ] -  \
-                                        getLC(l,c)->weight_decay_factor * (l->fired[ *ni ] + l->syn_fired[ *ni ][ *syn_id ]) * l->W[ *ni ][ *syn_id ] );
-#endif               
-            double wmax = getLC(l,c)->wmax;
-//            if(*syn_id == 47) {
-//                printf("%f %f\n", l->W[ *ni ][ *syn_id ], dw);
-//            }
-            dw = bound_grad(&l->W[ *ni ][ *syn_id ], &dw, &wmax, c);
-    //            if(l->syn_spec[*ni][*syn_id]>0) {
+            dw = bound_grad(&l->W[ *ni ][ *syn_id ], &dw, &getLC(l,c)->wmax, c);
+//            if(l->syn_spec[*ni][*syn_id]>0) {
                 l->W[ *ni ][ *syn_id ] += dw;
-    //            } else {
-    //                l->W[ *ni ][ *syn_id ] += dw*0.1;
-    //            }
+//            } else {
+//            }
 
             
             if((fabs(ls->C[ *ni ][ *syn_id ]) < LEARN_ACT_TOL) && (fabs(dC) < LEARN_ACT_TOL)) {
-//                printf("drop learn node %zu %f %f\n", *ni, ls->C[ *ni ][ *syn_id ], dC);
                 TEMPLATE(dropNodeLList,ind)(ls->learn_syn_ids[ *ni ], act_node);
             }
             if( isnan(dw) ) { 

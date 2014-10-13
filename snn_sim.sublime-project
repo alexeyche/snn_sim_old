@@ -1,0 +1,25 @@
+{
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": "sources",
+            "file_exclude_patterns" : [ "*.gitignore", ".*.swp" ]
+		}
+	],
+	"settings":
+    {
+        "tab_size": 4
+    },
+    "build_systems":
+    [
+        {
+            "name": "make",
+            "cmd": ["make", "-j8"],
+            "working_dir": "${project_path}/build",
+            "path": "/usr/local/bin:/usr/bin",
+            "selector": "source.makefile",
+            "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$"
+        }
+    ]
+}

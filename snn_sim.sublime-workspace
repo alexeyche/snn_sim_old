@@ -1,0 +1,303 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "snn_sim.sublime-project",
+			"settings":
+			{
+				"buffer_size": 521,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "\n\n#include \"constants.h\"\n\n#include <snnlib/util/templates_clean.h>\n#define T pLConst\n#include <snnlib/util/util_vector_tmpl.c>\n\nConstants* createConstants(const char *filename) {\n    Constants *c = (Constants*)malloc(sizeof(Constants));\n    c->adex = (AdExConstants*) malloc( sizeof(AdExConstants) );\n    c->res_stdp = (ResourceSTDPConstants*) malloc( sizeof(ResourceSTDPConstants) );\n    c->tr_stdp = (TripleSTDPConstants*) malloc( sizeof(TripleSTDPConstants) );\n    c->preproc = (PreprocessConstants*) malloc( sizeof(PreprocessConstants) );\n    c->pacemaker = (PacemakerConstants*) malloc( sizeof(PacemakerConstants) );\n    c->wta = (WtaConstants*) malloc( sizeof(WtaConstants) );\n    c->lc = TEMPLATE(createVector,pLConst)();\n\n    if (ini_parse(filename, file_handler, c) < 0) {\n        printf(\"Can't load %s\\n\", filename);\n        return(NULL);\n    }\n    \n    c->__target_rate = c->target_rate/c->sim_dim;\n    c->__pr = c->pr/c->sim_dim;\n    c->wta->__max_freq = c->wta->max_freq/c->sim_dim;\n    c->res_stdp->__Aplus_max_Amin = 1.0/max(c->res_stdp->Aplus, c->res_stdp->Aminus);\n    c->tr_stdp->__Aminus_cube_delim_p_target = c->tr_stdp->Aminus * 1.0/(c->tr_stdp->p_target * c->tr_stdp->p_target * c->tr_stdp->p_target);\n    c->tr_stdp->__Aplus = (c->tr_stdp->Aminus * c->tr_stdp->tau_minus)/( (c->tr_stdp->p_target/1000.0) * c->tr_stdp->tau_plus * c->tr_stdp->tau_minus);\n    c->tr_stdp->__sec_tau_average = c->tr_stdp->tau_average/1000;\n    for(size_t i=0; i<c->lc->size; i++) {\n        if((getLayerConstantsC(c,i)->determ)&&(getLayerConstantsC(c,i)->learn)) {\n            printf(\"Can't learn anything in determenistic mode\\n\");\n            exit(1);\n        }\n        if(getLayerConstantsC(c,i)->net_edge_prob_group_size == 0) {\n            getLayerConstantsC(c,i)->net_edge_prob_group_size = getLayerConstantsC(c,i)->N;\n        }\n        if(getLayerConstantsC(c,i)->input_edge_prob_group_size == 0) {\n            getLayerConstantsC(c,i)->input_edge_prob_group_size = getLayerConstantsC(c,i)->N;\n        }\n    }\n\n    return(c);\n}\nvoid deleteConstants(Constants *c) {\n    TEMPLATE(deleteVector,pLConst)(c->lc);\n    free(c->adex);\n    free(c->res_stdp);\n    free(c->preproc);\n    free(c->tr_stdp);\n    free(c);\n}\n\nindVector* indVectorParse(const char *vals) {\n    indVector *v = TEMPLATE(createVector,ind)();\n    char *token;\n    char *string = strdup(vals);\n    while ((token = strsep(&string, \" \")) != NULL) {\n        TEMPLATE(insertVector,ind)(v, atoi(token));\n    }\n    free(string);\n    return(v);\n}\n\ndoubleVector* doubleVectorParse(const char *vals) {\n    doubleVector *v = TEMPLATE(createVector,double)();\n    char *token;\n    char *string = strdup(vals);\n    while ((token = strsep(&string, \" \")) != NULL) {\n        TEMPLATE(insertVector,double)(v, atof(token));\n    }\n    free(string);\n    return(v);\n}             \n\npccharVector* pccharVectorColonParse(const char *vals) {\n    pccharVector *v = TEMPLATE(createVector,pcchar)();\n    char *token;\n    char *string = strdup(vals);\n    while ((token = strsep(&string, \":\")) != NULL) {\n        TEMPLATE(insertVector,pcchar)(v, strdup(token));\n    }\n    free(string);\n    return(v);\n}\n\npccharVector* pccharVectorParse(const char *vals) {\n    pccharVector *v = TEMPLATE(createVector,pcchar)();\n    char *token;\n    char *string = strdup(vals);\n    while ((token = strsep(&string, \" \")) != NULL) {\n        TEMPLATE(insertVector,pcchar)(v, strdup(token));\n    }\n    free(string);\n    return(v);\n}\n\nneuron_layer_t neuronTypeParse(char *str) {\n    if(strcmp(str, \"PoissonLayer\") == 0) {\n        return(EPoissonLayer);\n    }\n    if(strcmp(str, \"WtaLayer\") == 0) {\n        return(EWtaLayer);\n    }\n    if(strcmp(str, \"AdaptLayer\") == 0) {\n        return(EAdaptLayer);\n    }\n    if(strcmp(str, \"WtaAdaptLayer\") == 0) {\n        return(EWtaAdaptLayer);\n    }\n    printf(\"Can't do parse of neuron type: %s\\n\", str);\n    exit(1);\n}\n\nprob_fun_t probFunTypeParse(char *str) {\n//    EExpHennequin, ELinToyoizumi, EExpBohte, EExp\n    if(strcmp(str, \"ExpHennequin\") == 0) {\n        return(EExpHennequin);\n    }\n    if(strcmp(str, \"LinToyoizumi\") == 0) {\n        return(ELinToyoizumi);\n    }\n    if(strcmp(str, \"ExpBohte\") == 0) {\n        return(EExpBohte);\n    }\n    if(strcmp(str, \"Exp\") == 0) {\n        return(EExp);\n    }\n    if(strcmp(str, \"Determ\") == 0) {\n        return(EDeterm);\n    }\n    printf(\"Can't do parse of function type: %s\\n\", str);\n    exit(1);\n}\n\nlearning_rule_t learningRuleParse(char *str) {\n    if(strcmp(str, \"OptimalSTDP\") == 0) {\n        return(EOptimalSTDP);\n    }\n    if(strcmp(str, \"ResourceSTDP\") == 0) {\n        return(EResourceSTDP);\n    }\n    if(strcmp(str, \"SimpleSTDP\") == 0) {\n        return(ESimpleSTDP);\n    }\n    if(strcmp(str, \"TripleSTDP\") == 0) {\n        return(ETripleSTDP);\n    }\n    printf(\"Can't do parse of learning rule: %s\\n\", str);\n    exit(1);\n}\n\ntuning_curve_t tuningCurveParse(const char *str) {\n    if(strcmp(str, \"SigmaTC\") == 0) {\n        return(ESigmaTC);\n    }\n    if(strcmp(str, \"LinearTC\") == 0) {\n        return(ELinearTC);\n    }\n    printf(\"Can't do parse of tuning curve: %s\\n\", str);\n    exit(1);\n}\n\nbool boolParse(char *str) {\n    if(strcmp(str, \"true\") == 0) {\n        return(true);\n    }\n    if(strcmp(str, \"false\") == 0) {\n        return(false);\n    }\n    printf(\"Can't do parse of boolean field: %s\\n\", str);\n    exit(1);\n}\n\n    \nvoid fillNetEdgeProb(const char *str, LayerConstants *c) {\n    c->net_edge_prob0 = 0.0;\n    c->net_edge_prob1 = 0.0;\n    c->net_edge_prob_group_size = c->N;\n    pccharVector *v = pccharVectorColonParse(str);    \n    if(v->size == 0) {\n        printf(\"Too less argumnets in colon option in net_edge_prob\\n\");\n        exit(1);\n    } else\n    if(v->size == 1) {\n        c->net_edge_prob0 = atof(v->array[0]);\n        c->net_edge_prob1 = c->net_edge_prob0;\n    } else\n    if(v->size == 2) {\n        c->net_edge_prob1 = atof(v->array[1]);\n    } else \n    if(v->size == 3) {\n        c->net_edge_prob0 = atof(v->array[0]);\n        c->net_edge_prob_group_size = atoi(v->array[1]);\n        c->net_edge_prob1 = atof(v->array[2]);\n    } else {\n        printf(\"Too much argumnets in colon option in net_edge_prob\\n\");\n        exit(1);\n    }\n}\n\nvoid fillInputEdgeProb(const char *str, LayerConstants *c) {\n    c->input_edge_prob0 = 0.0;\n    c->input_edge_prob1 = 0.0;\n    c->input_edge_prob_group_size = c->N;\n    pccharVector *v = pccharVectorColonParse(str);    \n\n    if(v->size == 0) {\n        printf(\"Too less argumnets in colon option in input_edge_prob\\n\");\n        exit(1);\n    } else\n    if(v->size == 1) {\n        c->input_edge_prob0 = atof(v->array[0]);\n        c->input_edge_prob1 = c->input_edge_prob0;\n    } else\n    if(v->size == 2) {\n        c->input_edge_prob1 = atof(v->array[1]);\n    } else \n    if(v->size == 3) {\n        c->input_edge_prob0 = atof(v->array[0]);\n        c->input_edge_prob_group_size = atoi(v->array[1]);\n        c->input_edge_prob1 = atof(v->array[2]);\n    } else {\n        printf(\"Too much argumnets in colon option in input_edge_prob\\n\");\n        exit(1);\n    }\n}\n\n#define FILL_LAYER_CONST(name,type) {       \\\n        type##Vector *v = type##VectorParse(value); \\\n        size_t i;\\\n        for(i=0; i<v->size; i++) {   \\\n            if(!checkLC(c,i, #name)) break;  \\\n            getLayerConstantsC(c,i)->name = v->array[i]; \\\n        }                                   \\\n        for( ; i < c->lc->size; i++) { \\\n            getLayerConstantsC(c,i)->name = v->array[v->size-1]; \\\n        }\\\n        TEMPLATE(deleteVector,type)(v);        \\\n    } \\\n\n#define FILL_LAYER_CONST_FUN(name,type,fun) {       \\\n        type##Vector *v = type##VectorParse(value); \\\n        size_t i; \\\n        for(i=0; i<v->size; i++) {   \\\n            if(!checkLC(c,i, #name)) break;  \\\n            getLayerConstantsC(c,i)->name = fun(v->array[i]); \\\n        }                                   \\\n        for( ; i < c->lc->size; i++) { \\\n            getLayerConstantsC(c,i)->name = fun(v->array[v->size-1]); \\\n        }\\\n        TEMPLATE(deleteVector,type)(v);     \\\n    } \\\n\n#define FILL_LAYER_CONST_FUN_ARG(name,type,fun) {       \\\n        type##Vector *v = type##VectorParse(value); \\\n        size_t i; \\\n        for(i=0; i<v->size; i++) {   \\\n            if(!checkLC(c,i, #name)) break;  \\\n             fun(v->array[i], getLayerConstantsC(c,i)); \\\n        }                                   \\\n        for( ; i < c->lc->size; i++) { \\\n             fun(v->array[v->size-1], getLayerConstantsC(c,i)); \\\n        }\\\n        TEMPLATE(deleteVector,type)(v);     \\\n    } \\\n\n#define FILL_HIGH_AND_LOW_PARAM(low_name, high_name) { \\\n        pccharVector* v = pccharVectorColonParse(value);\\\n        assert(v->size > 0);                            \\\n        low_name = atof(v->array[0]);   \\\n        high_name = low_name; \\\n        if(v->size > 1) {                               \\\n            high_name = atof(v->array[1]);  \\\n        }                                 \\\n        TEMPLATE(deleteVector,pcchar)(v); \\\n}\\\n\nint file_handler(void* user, const char* section, const char* name, const char* value) {\n    Constants* c = (Constants*)user;\n\n    #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0\n    if (MATCH(\"preprocess\", \"N\")) {\n        c->preproc->N = atoi(value);\n    } else \n    if (MATCH(\"preprocess\", \"dt\")) {\n        c->preproc->dt = atof(value);\n    } else \n    if (MATCH(\"preprocess\", \"tuning_curve\")) {\n        c->preproc->tc = tuningCurveParse(value);    \n    } else \n    if (MATCH(\"preprocess\", \"max_curve_num\")) {\n        c->preproc->max_curve_num = atoi(value);    \n    } else \n    if (MATCH(\"preprocess\", \"prob_next_sigma\")) {\n        c->preproc->prob_next_sigma = atof(value);    \n    } else \n    if (MATCH(\"preprocess\", \"sigma\")) {\n        FILL_HIGH_AND_LOW_PARAM(c->preproc->sigma_low, c->preproc->sigma_high);\n    } else \n    if (MATCH(\"preprocess\", \"sigma_gain\")) {\n        FILL_HIGH_AND_LOW_PARAM(c->preproc->sigma_gain_low, c->preproc->sigma_gain_high);\n    } else \n    if (MATCH(\"preprocess\", \"bias\")) {\n        FILL_HIGH_AND_LOW_PARAM(c->preproc->bias_low, c->preproc->bias_high);\n    } else \n    if (MATCH(\"preprocess\", \"intercept\")) {\n        FILL_HIGH_AND_LOW_PARAM(c->preproc->intercept_low, c->preproc->intercept_high);\n    } else \n    if (MATCH(\"preprocess\", \"rate\")) {\n        FILL_HIGH_AND_LOW_PARAM(c->preproc->rate_low, c->preproc->rate_high);\n    } else \n    if (MATCH(\"preprocess\", \"gain\")) {\n        FILL_HIGH_AND_LOW_PARAM(c->preproc->gain_low, c->preproc->gain_high);\n    } else \n    if (MATCH(\"srm neuron\", \"e0\")) {\n        c->e0 = atof(value);\n    } else \n    if (MATCH(\"srm neuron\", \"e_exc\")) {\n        c->e_exc = atof(value);\n    } else \n     if (MATCH(\"srm neuron\", \"e_inh\")) {\n        c->e_inh = atof(value);\n    } else \n    if (MATCH(\"srm neuron\", \"ts\")) {\n        c->ts = atof(value);\n    } else \n    if (MATCH(\"srm neuron\", \"tm\")) {\n        c->tm = atof(value);\n    } else \n    if (MATCH(\"srm neuron\", \"tsr\")) {\n        c->tsr = atof(value);\n    } else \n    if (MATCH(\"srm neuron\", \"r0\")) {\n        c->r0 = atof(value);\n    } else \n    if (MATCH(\"srm neuron\", \"alpha\")) {\n        c->alpha = atof(value);\n    } else \n    if (MATCH(\"srm neuron\", \"beta\")) {\n        c->beta = atof(value);\n    } else \n    if (MATCH(\"srm neuron\", \"u_tr\")) {\n        c->u_tr = atof(value);\n    } else \n    if (MATCH(\"srm neuron\", \"gain_factor\")) {\n        c->gain_factor = atof(value);\n    } else \n    if (MATCH(\"srm neuron\", \"pr\")) {\n        c->pr = atof(value);\n    } else \n    if (MATCH(\"srm neuron\", \"u_rest\")) {\n        c->u_rest = atof(value);\n    } else \n    if (MATCH(\"srm neuron\", \"ta\")) {\n        c->ta = atof(value);\n    } else \n    if (MATCH(\"srm neuron\", \"tr\")) {\n        c->tr = atof(value);\n    } else \n    if (MATCH(\"srm neuron\", \"tb\")) {\n        c->tb = atof(value);\n    } else     \n    if (MATCH(\"srm neuron\", \"qa\")) {\n        c->qa = atof(value);\n    } else \n    if (MATCH(\"srm neuron\", \"qr\")) {\n        c->qr = atof(value);\n    } else \n    if (MATCH(\"srm neuron\", \"qb\")) {\n        c->qb = atof(value);\n    } else \n    if (MATCH(\"sim\", \"dt\")) {\n        c->dt = atof(value);\n    } else \n    if (MATCH(\"sim\", \"sim_dim\")) {\n        c->sim_dim = atof(value);\n    } else \n    if (MATCH(\"sim\", \"epochs\")) {\n        c->epochs = atof(value);\n    } else \n    if (MATCH(\"sim\", \"duration\")) {\n        c->duration = atof(value);\n    } else \n    if (MATCH(\"sim\", \"seed\")) {\n        c->seed = atoi(value);\n    } else \n    if (MATCH(\"sim\", \"target_neurons\")) {\n        c->target_neurons = strcmp(value, \"true\") == 0;\n    } else \n    if (MATCH(\"sim\", \"M\")) {\n        c->M = atoi(value);\n    } else \n    if (MATCH(\"layer\", \"neuron_type\")) {\n        FILL_LAYER_CONST_FUN(neuron_type,pcchar,neuronTypeParse)\n    } else \n    if (MATCH(\"layer\", \"prob_fun\")) {\n        FILL_LAYER_CONST_FUN(prob_fun,pcchar,probFunTypeParse)\n    } else \n    if (MATCH(\"layer\", \"learning_rule\")) {\n        FILL_LAYER_CONST_FUN(learning_rule,pcchar,learningRuleParse)\n    } else \n    if (MATCH(\"layer\", \"learn\")) {\n        FILL_LAYER_CONST_FUN(learn,pcchar,boolParse)\n    } else \n    if (MATCH(\"layer\", \"determ\")) {\n        FILL_LAYER_CONST_FUN(determ,pcchar,boolParse)\n    } else \n    if (MATCH(\"layer\", \"N\")) {\n        FILL_LAYER_CONST(N,ind)\n    } else \n    if (MATCH(\"layer\", \"lrate\")) {\n        FILL_LAYER_CONST(lrate,double)\n    } else \n    if (MATCH(\"layer\", \"net_edge_prob\")) {\n        FILL_LAYER_CONST_FUN_ARG(net_edge_prob0,pcchar,fillNetEdgeProb)\n    } else \n    if (MATCH(\"layer\", \"input_edge_prob\")) {\n        FILL_LAYER_CONST_FUN_ARG(input_edge_prob0,pcchar,fillInputEdgeProb)\n    } else \n    if (MATCH(\"layer\", \"output_edge_prob\")) {\n        FILL_LAYER_CONST(output_edge_prob,double)\n    } else \n    if (MATCH(\"layer\", \"weight_decay_factor\")) {\n        FILL_LAYER_CONST(weight_decay_factor,double)\n    } else \n    if (MATCH(\"layer\", \"weight_per_neuron\")) {\n        FILL_LAYER_CONST(weight_per_neuron,double)\n    } else \n    if (MATCH(\"layer\", \"inhib_frac\")) {\n        FILL_LAYER_CONST(inhib_frac,double)\n    } else\n    if (MATCH(\"layer\", \"ws\")) {\n        FILL_LAYER_CONST(ws,double)\n    } else \n    if (MATCH(\"layer\", \"wmax\")) {\n        FILL_LAYER_CONST(wmax,double)\n    } else \n    if (MATCH(\"layer\", \"aw\")) {\n        FILL_LAYER_CONST(aw,double)\n    } else \n    if (MATCH(\"layer\", \"weight_var\")) {\n        FILL_LAYER_CONST(weight_var,double)\n    } else \n    if (MATCH(\"layer\", \"syn_delays_gain\")) {\n        FILL_LAYER_CONST(syn_delays_gain,double)\n    } else \n    if (MATCH(\"layer\", \"syn_delays_rate\")) {\n        FILL_LAYER_CONST(syn_delays_rate,double)\n    } else \n    if (MATCH(\"layer\", \"axonal_delays_gain\")) {\n        FILL_LAYER_CONST(axonal_delays_gain,double)\n    } else \n    if (MATCH(\"layer\", \"axonal_delays_rate\")) {\n        FILL_LAYER_CONST(axonal_delays_rate,double)\n    } else \n    if (MATCH(\"layer\", \"ltd_factor\")) {\n        FILL_LAYER_CONST(ltd_factor,double)\n    } else \n    if (MATCH(\"optimal stdp\", \"tc\")) {\n        c->tc = atof(value);\n    } else \n    if (MATCH(\"optimal stdp\", \"mean_p_dur\")) {\n        c->mean_p_dur = atof(value);\n    } else \n    if (MATCH(\"optimal stdp\", \"target_rate\")) {\n        c->target_rate = atof(value);\n    } else \n    if (MATCH(\"optimal stdp\", \"target_rate_factor\")) {\n        c->target_rate_factor = atof(value);\n    } else \n    if (MATCH(\"triple stdp\", \"A+\")) {\n        c->tr_stdp->Aplus = atof(value);\n    } else \n    if (MATCH(\"triple stdp\", \"A-\")) {\n        c->tr_stdp->Aminus = atof(value);\n    } else \n    if (MATCH(\"triple stdp\", \"tau+\")) {\n        c->tr_stdp->tau_plus = atof(value);\n    } else \n    if (MATCH(\"triple stdp\", \"tau-\")) {\n        c->tr_stdp->tau_minus = atof(value);\n    } else \n    if (MATCH(\"triple stdp\", \"tau_y\")) {\n        c->tr_stdp->tau_y = atof(value);\n    } else \n    if (MATCH(\"triple stdp\", \"p_target\")) {\n        c->tr_stdp->p_target = atof(value);\n    } else \n    if (MATCH(\"triple stdp\", \"tau_average\")) {\n        c->tr_stdp->tau_average = atof(value);\n    } else \n    if (MATCH(\"resource stdp\", \"A+\")) {\n        c->res_stdp->Aplus = atof(value);\n    } else \n    if (MATCH(\"resource stdp\", \"A-\")) {\n        c->res_stdp->Aminus = atof(value);\n    } else \n    if (MATCH(\"resource stdp\", \"tau+\")) {\n        c->res_stdp->tau_plus = atof(value);\n    } else \n    if (MATCH(\"resource stdp\", \"tau-\")) {\n        c->res_stdp->tau_minus = atof(value);\n    } else \n    if (MATCH(\"resource stdp\", \"tau_res\")) {\n        c->res_stdp->tau_res = atof(value);\n    } else \n    if (MATCH(\"learn\", \"reinforcement\")) {\n        c->reinforcement = strcmp(value, \"true\") == 0;\n    } else \n    if (MATCH(\"learn\", \"reward_baseline\")) {\n        c->reward_baseline = atof(value);\n    } else \n    if (MATCH(\"learn\", \"trew\")) {\n        c->trew = atof(value);\n    } else \n    if (MATCH(\"learn\", \"reward_ltp\")) {\n        c->reward_ltp = atof(value);\n    } else \n    if (MATCH(\"learn\", \"tel\")) {\n        c->tel = atof(value);\n    } else \n    if (MATCH(\"learn\", \"reward_ltd\")) {\n        c->reward_ltd = atof(value);\n    } else \n    if (MATCH(\"adex neuron\", \"C\")) {\n        c->adex->C = atof(value);\n    } else \n    if (MATCH(\"adex neuron\", \"t_ref\")) {\n        c->adex->t_ref = atof(value);\n    } else \n    if (MATCH(\"adex neuron\", \"gL\")) {\n        c->adex->gL = atof(value);\n    } else \n    if (MATCH(\"adex neuron\", \"EL\")) {\n        c->adex->EL = atof(value);\n    } else \n    if (MATCH(\"adex neuron\", \"Vtr\")) {\n        c->adex->Vtr = atof(value);\n    } else \n    if (MATCH(\"adex neuron\", \"slope\")) { \n        c->adex->slope = atof(value);\n    } else \n    if (MATCH(\"adex neuron\", \"tau_w\")) {\n        c->adex->tau_w = atof(value);\n    } else \n    if (MATCH(\"adex neuron\", \"a\")) {\n        c->adex->a = atof(value);\n    } else \n    if (MATCH(\"adex neuron\", \"b\")) {\n        c->adex->b = atof(value);\n    } else\n    if (MATCH(\"pacemaker\", \"amplitude\")) {\n        c->pacemaker->amplitude = atof(value);\n    } else \n    if (MATCH(\"pacemaker\", \"cumulative_period_delta\")) {\n        c->pacemaker->cumulative_period_delta = atof(value);\n    } else \n    if (MATCH(\"pacemaker\", \"frequency\")) {\n        c->pacemaker->frequency = atof(value);\n    } else \n    if (MATCH(\"pacemaker\", \"pacemaker_on\")) {\n        c->pacemaker->pacemaker_on = strcmp(value, \"true\") == 0;\n    } else \n    if (MATCH(\"wta\", \"max_freq\")) {\n        c->wta->max_freq = atof(value);\n    } else \n    {\n        return(0);\n    } \n    return(1);\n}\n\nLayerConstants* getLayerConstantsC(Constants *c, size_t i) {\n    return(c->lc->array[i]);\n}\n\nbool checkLC(Constants *c, size_t i, const char *field) {\n    if(c->lc->size > i) return(true); \n    if (strcmp(field, \"N\") == 0) {\n        LayerConstants *new_lc = (LayerConstants*) malloc(sizeof(LayerConstants));\n        TEMPLATE(insertVector,pLConst)(c->lc, new_lc);\n        return(true);\n    }\n    return(false);\n}\n\nvoid doublePrint(double v) {\n    printf(\"%f\\n\",v);\n}\nvoid uintPrint(unsigned int v) {\n    printf(\"%d\\n\",v);\n}\nvoid intPrint(int v) {\n    printf(\"%d\\n\",v);\n}\nvoid boolPrint(bool v) {\n    if(v) printf(\"true\\n\");\n    else printf(\"false\\n\");\n}\n\nvoid tuning_curve_tPrint(tuning_curve_t v) {\n    if(v == ESigmaTC) {\n        printf(\"SigmaTC\\n\");\n    }\n    if(v == ELinearTC) {\n        printf(\"LinearTC\\n\");\n    }\n}\n\nvoid AdExConstantsPrint(AdExConstants *c) {\n    printf(\"==================\\n\");\n    printf(\"C->\"); doublePrint(c->C);\n    printf(\"gL->\"); doublePrint(c->gL);\n    printf(\"EL->\"); doublePrint(c->EL);\n    printf(\"Vtr->\"); doublePrint(c->Vtr);\n    printf(\"slope->\"); doublePrint(c->slope);\n    printf(\"tau_w->\"); doublePrint(c->tau_w);\n    printf(\"a->\"); doublePrint(c->a);\n    printf(\"b->\"); doublePrint(c->b);\n    printf(\"t_ref->\"); doublePrint(c->t_ref);\n    printf(\"==================\\n\");\n}\n\nvoid TripleSTDPConstantsPrint(TripleSTDPConstants *c) {\n    printf(\"==================\\n\");\n    printf(\"Aplus->\"); doublePrint(c->Aplus);\n    printf(\"Aminus->\"); doublePrint(c->Aminus);\n    printf(\"tau_plus->\"); doublePrint(c->tau_plus);\n    printf(\"tau_minus->\"); doublePrint(c->tau_minus);\n    printf(\"tau_y->\"); doublePrint(c->tau_y);\n    printf(\"p_target->\"); doublePrint(c->p_target);\n    printf(\"tau_average->\"); doublePrint(c->tau_average);\n    printf(\"==================\\n\");\n}\n\n\nvoid ResourceSTDPConstantsPrint(ResourceSTDPConstants *c) {\n    printf(\"==================\\n\");\n    printf(\"Aplus->\"); doublePrint(c->Aplus);\n    printf(\"Aminus->\"); doublePrint(c->Aminus);\n    printf(\"tau_plus->\"); doublePrint(c->tau_plus);\n    printf(\"tau_minus->\"); doublePrint(c->tau_minus);\n    printf(\"tau_res->\"); doublePrint(c->tau_res);\n    printf(\"==================\\n\");\n}\n\nvoid PacemakerConstantsPrint(PacemakerConstants *c) {\n    printf(\"==================\\n\");\n    printf(\"pacemaker_on->\"); boolPrint(c->pacemaker_on);\n    printf(\"frequency->\"); doublePrint(c->frequency);\n    printf(\"cumulative_period_delta->\"); doublePrint(c->cumulative_period_delta);\n    printf(\"amplitude->\"); doublePrint(c->amplitude);\n    printf(\"==================\\n\");\n}\n\n\nvoid PreprocessConstantsPrint(PreprocessConstants *c) {\n    printf(\"==================\\n\");\n    printf(\"N->\"); size_tPrint(c->N);\n    printf(\"dt->\"); doublePrint(c->dt);\n    printf(\"tc->\"); tuning_curve_tPrint(c->tc);\n    printf(\"prob_next_sigma->\"); doublePrint(c->prob_next_sigma);\n    printf(\"max_curve_num->\"); size_tPrint(c->max_curve_num);\n    printf(\"sigma_gain_low->\"); doublePrint(c->sigma_gain_low);\n    printf(\"sigma_gain_high->\"); doublePrint(c->sigma_gain_high);\n    printf(\"sigma_low->\"); doublePrint(c->sigma_low);\n    printf(\"sigma_high->\"); doublePrint(c->sigma_high);\n    printf(\"intercept_low->\"); doublePrint(c->intercept_low);\n    printf(\"intercept_high->\"); doublePrint(c->intercept_high);\n    printf(\"rate_low->\"); doublePrint(c->rate_low);\n    printf(\"rate_high->\"); doublePrint(c->rate_high);\n    printf(\"==================\\n\");\n}\n    \n\nvoid pLConstVectorPrint(pLConstVector *v) {\n    printf(\"==================\\n\");\n    for(size_t i=0; i<v->size; i++) {\n        printf(\"LayerPoisson %zu\\n\", i);\n        LayerConstantsPrint(v->array[i]);\n    }\n    printf(\"==================\\n\");\n}\n\nvoid size_tPrint(size_t v) {\n    printf(\"%zu\\n\", v);\n}\n\n\nvoid learning_rule_tPrint(learning_rule_t v) {\n    if(v == EResourceSTDP) {\n        printf(\"ResourceSTDP\\n\");\n    }\n    if(v == EOptimalSTDP) {\n        printf(\"OptimalSTDP\\n\");\n    }\n    if(v == ESimpleSTDP) {\n        printf(\"SimpleSTDP\\n\");\n    }\n    if(v == ETripleSTDP) {\n        printf(\"TripleSTDP\\n\");\n    }\n}\n\nvoid neuron_layer_tPrint(neuron_layer_t v) {\n    if(v == EPoissonLayer) {\n        printf(\"PoissonLayer\\n\");\n    }\n    if(v == EWtaLayer) {\n        printf(\"WtaLayer\\n\");\n    }\n    if(v == EAdaptLayer) {\n        printf(\"AdaptLayer\\n\");\n    }\n    if(v == EWtaAdaptLayer) {\n        printf(\"WtaAdaptLayer\\n\");\n    }\n}\n\nvoid prob_fun_tPrint(prob_fun_t v) {\n    if(v == EExpHennequin) {\n        printf(\"ExpHennequin\\n\");\n    }\n    if(v == EExpBohte) {\n        printf(\"ExpBohte\\n\");\n    }\n    if(v == EExp) {\n        printf(\"Exp\\n\");\n    }\n    if(v == ELinToyoizumi) {\n        printf(\"LinToyoizumi\\n\");\n    }\n    if(v == EDeterm) {\n        printf(\"Determ\\n\");\n    }\n}\n\nvoid LayerConstantsPrint(LayerConstants *c) {\n    printf(\"\\tN->\"); size_tPrint(c->N);\n    printf(\"\\tlearning_rule->\"); learning_rule_tPrint(c->learning_rule);\n    printf(\"\\tneuron_type->\"); neuron_layer_tPrint(c->neuron_type);\n    printf(\"\\tprob_fun->\"); prob_fun_tPrint(c->prob_fun);\n    printf(\"\\tlearn->\"); boolPrint(c->learn);\n    printf(\"\\tdeterm->\"); boolPrint(c->determ);\n    printf(\"\\tnet_edge_prob0->\"); doublePrint(c->net_edge_prob0);\n    printf(\"\\tnet_edge_prob_group_size->\"); doublePrint(c->net_edge_prob_group_size);\n    printf(\"\\tnet_edge_prob1->\"); doublePrint(c->net_edge_prob1);\n    printf(\"\\tinput_edge_prob0->\"); doublePrint(c->input_edge_prob0);\n    printf(\"\\tinput_edge_prob_group_size->\"); doublePrint(c->input_edge_prob_group_size);\n    printf(\"\\tinput_edge_prob1->\"); doublePrint(c->input_edge_prob1);\n    printf(\"\\toutput_edge_prob->\"); doublePrint(c->output_edge_prob);\n    printf(\"\\tinhib_frac->\"); doublePrint(c->inhib_frac);\n    printf(\"\\tweight_per_neuron->\"); doublePrint(c->weight_per_neuron);\n    printf(\"\\twmax->\"); doublePrint(c->wmax);\n    printf(\"\\tweight_decay_factor->\"); doublePrint(c->weight_decay_factor);\n    printf(\"\\tweight_var->\"); doublePrint(c->weight_var);\n    printf(\"\\tlrate->\"); doublePrint(c->lrate);\n    printf(\"\\taxonal_delays_rate->\"); doublePrint(c->axonal_delays_rate);\n    printf(\"\\taxonal_delays_gain->\"); doublePrint(c->axonal_delays_gain);\n    printf(\"\\tsyn_delays_rate->\"); doublePrint(c->syn_delays_rate);\n    printf(\"\\tsyn_delays_gain->\"); doublePrint(c->syn_delays_gain);\n    printf(\"\\tws->\"); doublePrint(c->ws);\n    printf(\"\\taw->\"); doublePrint(c->aw);\n    printf(\"\\tltd_factor->\"); doublePrint(c->ltd_factor);\n}\n\n\n// sed -ne '78,132p' ./snn_sim/constants.h | sed -e 's/unsigned int/uint/g' | tr -d ';*' | grep -Ev '^[ ]*$'  | awk '{print \"    printf(\\\"\"$2\"->\\\"); \"$1\"Print(c->\"$2\");\"}'\nvoid printConstants(Constants *c) {\n    printf(\"e0->\"); doublePrint(c->e0);\n    printf(\"e_exc->\"); doublePrint(c->e_exc);\n    printf(\"e_inh->\"); doublePrint(c->e_inh);\n    printf(\"ts->\"); doublePrint(c->ts);\n    printf(\"tm->\"); doublePrint(c->tm);\n    printf(\"tsr->\"); doublePrint(c->tsr);\n    printf(\"alpha->\"); doublePrint(c->alpha);\n    printf(\"beta->\"); doublePrint(c->beta);\n    printf(\"u_tr->\"); doublePrint(c->u_tr);\n    printf(\"r0->\"); doublePrint(c->r0);\n    printf(\"tr->\"); doublePrint(c->tr);\n    printf(\"ta->\"); doublePrint(c->ta);\n    printf(\"tb->\"); doublePrint(c->tb);\n    printf(\"qr->\"); doublePrint(c->qr);\n    printf(\"qa->\"); doublePrint(c->qa);\n    printf(\"qb->\"); doublePrint(c->qb);\n    printf(\"gain_factor->\"); doublePrint(c->gain_factor);\n    printf(\"pr->\"); doublePrint(c->pr);\n    printf(\"__pr->\"); doublePrint(c->__pr);\n    printf(\"u_rest->\"); doublePrint(c->u_rest);\n    printf(\"tc->\"); doublePrint(c->tc);\n    printf(\"mean_p_dur->\"); doublePrint(c->mean_p_dur);\n    printf(\"duration->\"); doublePrint(c->duration);\n    printf(\"dt->\"); doublePrint(c->dt);\n    printf(\"sim_dim->\"); doublePrint(c->sim_dim);\n    printf(\"seed->\"); uintPrint(c->seed);\n    printf(\"target_neurons->\"); boolPrint(c->target_neurons);\n    printf(\"M->\"); intPrint(c->M);\n    printf(\"lc->\"); pLConstVectorPrint(c->lc);\n    printf(\"target_rate->\"); doublePrint(c->target_rate);\n    printf(\"__target_rate->\"); doublePrint(c->__target_rate);\n    printf(\"target_rate_factor->\"); doublePrint(c->target_rate_factor);\n    printf(\"epochs->\"); intPrint(c->epochs);\n    printf(\"adex->\"); AdExConstantsPrint(c->adex);\n    printf(\"res_stdp->\"); ResourceSTDPConstantsPrint(c->res_stdp);\n    printf(\"tr_stdp->\"); TripleSTDPConstantsPrint(c->tr_stdp);\n    printf(\"preproc->\"); PreprocessConstantsPrint(c->preproc);\n    printf(\"reinforcement->\"); boolPrint(c->reinforcement);\n    printf(\"reward_ltd->\"); doublePrint(c->reward_ltd);\n    printf(\"reward_ltp->\"); doublePrint(c->reward_ltp);\n    printf(\"reward_baseline->\"); doublePrint(c->reward_baseline);\n    printf(\"tel->\"); doublePrint(c->tel);\n    printf(\"trew->\"); doublePrint(c->trew);\n    printf(\"pacemaker->\"); PacemakerConstantsPrint(c->pacemaker);\n}\n",
+			"file": "sources/snnlib/constants.c",
+			"file_size": 27088,
+			"file_write_time": 1413220065000000,
+			"settings":
+			{
+				"buffer_size": 27088,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/alexeyche/.config/sublime-text-2/Packages/User/Preferences.sublime-settings",
+			"settings":
+			{
+				"buffer_size": 194,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/home/alexeyche/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings",
+			"settings":
+			{
+				"buffer_size": 13677,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "make",
+	"command_palette":
+	{
+		"height": 75.0,
+		"selected_items":
+		[
+			[
+				":",
+				"File: Save All"
+			],
+			[
+				":o",
+				":$ - EOF"
+			]
+		],
+		"width": 392.0
+	},
+	"console":
+	{
+		"height": 653.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/alexeyche/prog/snn_sim/snn_sim.sublime-project",
+		"/home/alexeyche/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/alexeyche/prog/snn_sim/sources/tools/filt/filt_opts.h",
+		"/home/alexeyche/prog/snn_sim/sources/tools/sim/snn_sim.c",
+		"/home/alexeyche/.config/sublime-text-3/Packages/Default/Default (Linux).sublime-keymap",
+		"/home/alexeyche/.config/sublime-text-3/Packages/User/make.sublime-build",
+		"/home/alexeyche/prog/snn_sim/sources/snnlib/sim/sim.c",
+		"/home/alexeyche/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings"
+	],
+	"find":
+	{
+		"height": 25.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"ignore"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "snn_sim.sublime-project",
+					"settings":
+					{
+						"buffer_size": 521,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								343,
+								343
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "sources/snnlib/constants.c",
+					"settings":
+					{
+						"buffer_size": 27088,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								857,
+								857
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "/home/alexeyche/.config/sublime-text-2/Packages/User/Preferences.sublime-settings",
+					"settings":
+					{
+						"buffer_size": 194,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								190,
+								190
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "/home/alexeyche/.config/sublime-text-2/Packages/Default/Preferences.sublime-settings",
+					"settings":
+					{
+						"buffer_size": 13677,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								13639,
+								13639
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4930.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 34.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 194.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"replace":
+	{
+		"height": 46.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true
+}

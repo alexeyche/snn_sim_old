@@ -20,6 +20,7 @@ Constants* createConstants(const char *filename) {
         printf("Can't load %s\n", filename);
         return(NULL);
     }
+    
     c->__target_rate = c->target_rate/c->sim_dim;
     c->__pr = c->pr/c->sim_dim;
     c->wta->__max_freq = c->wta->max_freq/c->sim_dim;

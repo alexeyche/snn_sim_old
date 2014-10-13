@@ -99,7 +99,6 @@ double prob_fun_ExpHennequin( const double *u, const Constants *c) {
 }
 double prob_fun_stroke_ExpHennequin( const double *u, const Constants *c) {
     double part = exp(c->beta*(*u - c->u_tr));
-//    double part = exp(c->beta*(*u - c->u_tr));
     return( ( (part*c->r0*c->beta) / ( 1+part))/c->sim_dim );
 }
 
