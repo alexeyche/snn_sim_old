@@ -19,7 +19,7 @@ const$setValue("layer","weight_decay_factor", 0.015)
 const$setValue("layer","net_edge_prob", 0.0)
 const$setValue("layer","input_edge_prob", 1.0)
 const$setValue("layer","input_edge_prob", 1.0)
-const$setValue("optimal stdp", "mean_p_dur", 30000.0)
+const$setValue("optimal stdp", "mean_p_dur", 4*511.0)
 
 
 input_spikes_file = "/home/alexeyche/prog/sim/spikes/ucr_2_classes_test.bin"
@@ -29,7 +29,7 @@ spikes = getSpikesFromMatrix(loadMatrix(input_spikes_file,1))
 Tmax=max(sapply(spikes,max))+100
 
 
-max_ep = ceiling(30000/Tmax) + 3
+max_ep = ceiling(4*511.0/Tmax) + 1
 #max_ep = 2
 mean_p = NULL
 weights = list()
@@ -41,7 +41,7 @@ t0=0
 statLevel = 2
 s = RSim$new(const, statLevel, jobs)
 for(i in 1:max_ep) {
-    if(i > (max_ep-3)) { 
+    if(i > (max_ep-1)) { 
         s$setStatLevel(2)
     } else {
         s$setStatLevel(0)
