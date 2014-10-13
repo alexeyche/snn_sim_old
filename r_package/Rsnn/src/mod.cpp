@@ -16,6 +16,8 @@ RCPP_MODULE(snnMod) {
     .method("run", &RSim::run, "Run sim")
     .method("getLayerStat", &RSim::getLayerStat, "Get layer stat")
     .method("W", &RSim::W, "Get List of W matrices")
+    .method("getStatLevel", &RSim::getStatLevel, "Get stat levels of layers")
+    .method("setStatLevel", &RSim::setStatLevel, "Set stat levels of layers")
     ;
     Rcpp::class_<RConstants>("RConstants")
     .constructor<std::string>()

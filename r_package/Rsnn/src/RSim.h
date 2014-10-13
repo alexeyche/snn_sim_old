@@ -14,7 +14,7 @@ extern "C" {
 
 class RSim {
 public:
-    RSim(RConstants *rc, unsigned char statLevel, size_t nthreads) {
+    RSim(RConstants *rc, unsigned char statLevel_, size_t nthreads) : statLevel(statLevel_) {
         s = createSim(nthreads, statLevel, rc->c);
         configureLayersSim(s, rc->c);
         configureNetSpikesSim(s, rc->c);
@@ -33,6 +33,24 @@ public:
         for(size_t li=0; li < s->layers->size; li++) {
             std::cout <<"\tlayer " << li+1 << ". size: " << s->layers->array[li]->N << "\n";
         }
+    }
+    void setStatLevel(Rcpp::IntegerVector stat_lev) {
+        for(size_t li=0; li < stat_lev.size(); li++) {
+            if(stat_lev(li) > statLevel) {
+                Rcpp::stop("Sim was created with lower statLevel. Create new one with appropriate statLevel");
+            }
+            if(li >= s->layers->size) {
+                Rcpp::stop("Stat level bigger than layers count. Ignoring");
+            }
+            s->layers->array[li]->stat->statLevel = stat_lev(li);
+        }
+    }
+    Rcpp::IntegerVector getStatLevel() {
+        Rcpp::IntegerVector stat_levs(s->layers->size);
+        for(size_t li=0; li<s->layers->size; li++) {
+            stat_levs(li) = s->layers->array[li]->stat->statLevel;
+        }
+        return stat_levs;
     }
     void printConn() {
         printConnMap(s->ns);
@@ -76,6 +94,7 @@ public:
         return l;
     }
 private:
+    uchar statLevel;
     Sim *s;
 };
 

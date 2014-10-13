@@ -268,7 +268,7 @@ void toStartValues_Poisson(LayerPoisson *l, const Constants *c) {
 
 void propagateSpike_Poisson(LayerPoisson *l, const size_t *ni, const SynSpike *sp, const SimContext *s) {
     const Constants *c = s->c;
-    if( ( l->syn[ *ni ][ sp->syn_id ] < SYN_ACT_TOL ) && ( l->syn[ *ni ][ sp->syn_id ] > -SYN_ACT_TOL )){
+    if( fabs(l->syn[ *ni ][ sp->syn_id ]) < SYN_ACT_TOL ) {
         TEMPLATE(addValueLList,ind)(l->active_syn_ids[*ni], sp->syn_id);
     } 
     l->syn[*ni][ sp->syn_id ] += l->syn_spec[*ni][ sp->syn_id ] * c->e0;
@@ -332,7 +332,8 @@ void calculateDynamics_Poisson(LayerPoisson *l, const size_t *ni, const SimConte
         if(l->syn_fired[ *ni ][ *syn_id ] == 1) {
             l->syn_fired[ *ni ][ *syn_id ] = 0; 
         }
-        if( ( l->syn[ *ni ][ *syn_id ] < SYN_ACT_TOL ) && ( l->syn[ *ni ][ *syn_id ] > -SYN_ACT_TOL )){
+        if( fabs(l->syn[ *ni ][ *syn_id ]) < SYN_ACT_TOL ) {
+//            printf("drop syn node %zu %f\n", *ni, l->syn[ *ni ][ *syn_id ]);
             TEMPLATE(dropNodeLList,ind)(l->active_syn_ids[ *ni ], act_node);
         }
     }

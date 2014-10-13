@@ -4,7 +4,7 @@
 require(Rsnn)
 
 M = 100
-const_ini = "/home/alexeyche/prog/alexeyche-junk/cns/c/snn_sim/constants.ini"
+const_ini = "/home/alexeyche/prog/snn_sim/constants.ini"
 N = 100
 jobs = 4
 
@@ -55,18 +55,13 @@ for(i in 1:max_ep) {
         t0=t0+Tmax
     }
     cat(i,"\n")
-    
-    s$serializeModelToFile(model)
-
-    mean_p = cbind(mean_p, loadMatrix(model,7))
-    weights[[i]] = s$W()[[1]]
 }
 
 if(any(s$getStatLevel()>0)) {
     stat = s$getLayerStat(0)
-    Tplot = 1:(Tmax*3)
-    nid = 1
-    syn = 39
+    Tplot = 1:(Tmax*1)
+    nid = 2
+    syn = 48
     p = stat[[1]]
     u = stat[[2]]    
     if(statLevel>1) {
@@ -75,11 +70,12 @@ if(any(s$getStatLevel()>0)) {
         B = stat[[2+2*N+1]]
         Cn = stat[[2+2*N+1+nid]]
         
-        par(mfrow=c(4,1))
-        plotl(B[nid,Tplot])
+        par(mfrow=c(3,1))
+        #plotl(B[nid,Tplot])
         spikes = net[[M+nid]][net[[M+nid]]<max(Tplot)]
         plot(spikes, rep(1,length(spikes)), xlim=c(min(Tplot),max(Tplot)) )
-        plotl(syns[syn,Tplot])
+        #plotl(syns[syn,Tplot])
+        plotl(Cn[syn,Tplot])
         plotl(w[syn,Tplot])
     }
 } else {

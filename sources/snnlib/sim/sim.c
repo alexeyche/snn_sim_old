@@ -222,6 +222,7 @@ void* simRunRoutine(void *args) {
     if(sw->thread_id == 0) {
         s->ctx->actual_running_time += s->rt->Tmax;
     }
+    pthread_barrier_wait( &barrier );
     return(NULL);
 }
 

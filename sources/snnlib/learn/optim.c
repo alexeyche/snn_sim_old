@@ -59,7 +59,7 @@ void toStartValues_OptimalSTDP(learn_t *ls_t) {
 
 void propagateSynSpike_OptimalSTDP(learn_t *ls_t, const size_t *ni, const SynSpike *sp, const Constants *c) {
     OptimalSTDP *ls = (OptimalSTDP*)ls_t;
-    if( (ls->C[ *ni ][ sp->syn_id ] < LEARN_ACT_TOL ) && (ls->C[ *ni ][ sp->syn_id ] > -LEARN_ACT_TOL ) ) {
+    if( fabs(ls->C[ *ni ][ sp->syn_id ]) < LEARN_ACT_TOL ) {
         TEMPLATE(addValueLList,ind)(ls->learn_syn_ids[*ni], sp->syn_id);
     }
 }
@@ -99,7 +99,9 @@ void trainWeightsStep_OptimalSTDP(learn_t *ls_t, const double *u, const double *
             double p_stroke = l->prob_fun_stroke(u,c);
             double dC = C_calc( &l->fired[ *ni ], p, &p_stroke, u, M, &l->syn[ *ni ][ *syn_id ], c); // * l->syn_spec[ *ni ][ *syn_id ];
             ls->C[ *ni ][ *syn_id ] += -ls->C[ *ni ][ *syn_id ]/c->tc + dC;
-//                    printf("dC: %f C: %f, params: %d %f %f %f %f\n", dC, ls->C[ *ni ][ *syn_id ], l->fired[ *ni ], p, u, l->syn[ *ni ][ *syn_id ], M);
+//            if(*syn_id == 47) {
+//                printf("dC: %f C: %f, params: %d %f %f %f %f\n", dC, ls->C[ *ni ][ *syn_id ], l->fired[ *ni ], *p, *u, l->syn[ *ni ][ *syn_id ], *M);
+//            }
             
 #if RATE_NORM == PRESYNAPTIC
             double dw = getLC(l,c)->lrate*( ls->C[ *ni ][ *syn_id ]*ls->B[ *ni ] -  \
@@ -109,6 +111,9 @@ void trainWeightsStep_OptimalSTDP(learn_t *ls_t, const double *u, const double *
                                         getLC(l,c)->weight_decay_factor * (l->fired[ *ni ] + l->syn_fired[ *ni ][ *syn_id ]) * l->W[ *ni ][ *syn_id ] );
 #endif               
             double wmax = getLC(l,c)->wmax;
+//            if(*syn_id == 47) {
+//                printf("%f %f\n", l->W[ *ni ][ *syn_id ], dw);
+//            }
             dw = bound_grad(&l->W[ *ni ][ *syn_id ], &dw, &wmax, c);
     //            if(l->syn_spec[*ni][*syn_id]>0) {
                 l->W[ *ni ][ *syn_id ] += dw;
@@ -117,9 +122,8 @@ void trainWeightsStep_OptimalSTDP(learn_t *ls_t, const double *u, const double *
     //            }
 
             
-            if( (ls->C[ *ni ][ *syn_id ] < LEARN_ACT_TOL ) && (ls->C[ *ni ][ *syn_id ] > -LEARN_ACT_TOL ) && 
-                                                              (dC < LEARN_ACT_TOL ) && (dC > -LEARN_ACT_TOL ) ) {
-
+            if((fabs(ls->C[ *ni ][ *syn_id ]) < LEARN_ACT_TOL) && (fabs(dC) < LEARN_ACT_TOL)) {
+//                printf("drop learn node %zu %f %f\n", *ni, ls->C[ *ni ][ *syn_id ], dC);
                 TEMPLATE(dropNodeLList,ind)(ls->learn_syn_ids[ *ni ], act_node);
             }
             if( isnan(dw) ) { 
