@@ -32,6 +32,10 @@ while getopts "m:t:e:r:s:" opt; do
     esac
 done    
 ([ -z $MODEL ] || [ -z $EVALUATE ] || [ -z $TRAIN_SPIKES ]) && usage && exit 1
+[ ! -f $MODEL ] && echo "Can't open $MODEL" && exit 1
+[ ! -f $EVALUATE ] && echo "Can't open $EVALUATE" && exit 1
+
+export LC_NUMERIC="en_US.UTF-8"
 
 WORK_DIR=$(dirname $MODEL)
 JOBS=$(cat /proc/cpuinfo | grep processor | wc -l)

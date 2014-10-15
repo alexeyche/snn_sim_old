@@ -138,7 +138,7 @@ done
 
 if [ -n "$EVALUATE" ]; then
     INPUT_FILE=$INPUT_FILES_DIR/$(echo $INPUT_FILES_BN | cut -d ' ' -f 1)
-    ./eval_model.sh -m $WORK_DIR/${LAST_EP}_model.bin -e $EVALUATE -t $INPUT_FILE 
+    ./eval_model.sh -m $WORK_DIR/${LAST_EP}_model.bin -e $EVALUATE -t $INPUT_FILE -r 1 -s srm
 fi    
 
 popd &> /dev/null
