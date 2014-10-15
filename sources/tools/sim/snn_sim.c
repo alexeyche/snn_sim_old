@@ -42,12 +42,15 @@ int main(int argc, char **argv) {
 
     if(model_to_load) {
         loadLayersFromFile(s, model_to_load);
+        free(model_to_load);
     }
 
     configureNetSpikesSim(s, c);
 
     SpikePatternsList *spl = readSpikePatternsListFromFile(a.input_spikes_file);
     simSetInputSpikePatterns(s, spl);
+    deleteSpikePatternsList(spl);
+
     configureSynapses(s, c);
     if(a.Tmax > 0) {
         s->rt->Tmax = a.Tmax;
@@ -79,6 +82,7 @@ int main(int argc, char **argv) {
     
     if(model_to_save) { 
         saveLayersToFile(s, model_to_save);
+        free(model_to_save);
     }
     if(a.output_spikes_file) {
         pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
@@ -94,4 +98,5 @@ int main(int argc, char **argv) {
     }
     deleteSim(s);
     deleteConstants(c);
+    deleteArgOptionsSim(&a);
 }

@@ -9,13 +9,13 @@ extern char *strdup(const char *s);
 
 typedef struct {
     int jobs;
-    const char *const_filename;
-    const char *stat_file;
-    const char *model_file;
-    const char *model_file_save;
-    const char *model_file_load;
-    const char *output_spikes_file;
-    const char *input_spikes_file;
+    char *const_filename;
+    char *stat_file;
+    char *model_file;
+    char *model_file_save;
+    char *model_file_load;
+    char *output_spikes_file;
+    char *input_spikes_file;
     double Tmax;
     int input_port;
     int output_port;
@@ -238,6 +238,17 @@ ArgOptionsSim parseSimOptions(int argc, char **argv) {
         usageSim();
     }
     return(args);
+}
+
+void deleteArgOptionsSim(ArgOptionsSim *args) {
+    if(args->const_filename) free(args->const_filename);
+    if(args->stat_file) free(args->stat_file);
+    if(args->model_file) free(args->model_file);
+    if(args->model_file_save) free(args->model_file_save);
+    if(args->model_file_load) free(args->model_file_load);
+    if(args->output_spikes_file) free(args->output_spikes_file);
+    if(args->input_spikes_file) free(args->input_spikes_file);
+    free(args);
 }
 
 #endif    

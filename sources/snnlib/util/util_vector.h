@@ -22,7 +22,7 @@
 #include "util_vector_tmpl.h"
 
 #include <snnlib/util/templates_clean.h>
-#define T pcchar
+#define T pchar
 #include "util_vector_tmpl.h"
 
 

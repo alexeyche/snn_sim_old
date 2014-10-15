@@ -16,4 +16,6 @@ TVEC(T)* TEMPLATE(copyFromArray,T)(T *a, size_t size);
 TVEC(T)* TEMPLATE(copyVector,T)(TVEC(T) *v);
 TVEC(T)* TEMPLATE(tailVector,T)(TVEC(T) *v, size_t n);
 TVEC(T)* TEMPLATE(headVector,T)(TVEC(T) *v, size_t n);
+void TEMPLATE(copyToVector,T)(TVEC(T) *oldv, TVEC(T) *newv);
+void TEMPLATE(copyToAlloc,T)(TVEC(T) *oldv, T *alloc);
 #endif

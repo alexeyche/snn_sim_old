@@ -20,7 +20,7 @@
 
 #include <snnlib/util/templates_clean.h>
 #define DESTRUCT free
-#define T pcchar
+#define T pchar
 #include "util_vector_tmpl.c"
 
 

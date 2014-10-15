@@ -17,6 +17,7 @@ FileStream* createInputFileStream(const char *fname) {
 
 void deleteFileStream(FileStream *fs) {
     fclose(fs->fd);
+    free(fs->fname);
     free(fs);
 }
 

@@ -62,7 +62,7 @@ void configureLayersSim(Sim *s, Constants *c) {
             outp = NULL;
         }        
         l->configureLayer(l, inp, outp, c);
-        if(inp) {
+        if((inp)&&(li != 0)) {
             TEMPLATE(deleteVector,ind)(inp);
         }
         if(outp) {

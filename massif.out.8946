@@ -1,0 +1,597 @@
+desc: (none)
+cmd: ./build/bin/snn_sim -c /home/alexeyche/prog/sim/runs/PoissonLayer_OptimalSTDP_ExpHennequin_0001/constants.ini -i /home/alexeyche/prog/sim/spikes/ucr_2_classes_test.bin -o /home/alexeyche/prog/sim/runs/PoissonLayer_OptimalSTDP_ExpHennequin_0001/30_output_spikes.bin -ml /home/alexeyche/prog/sim/runs/PoissonLayer_OptimalSTDP_ExpHennequin_0001/29_model.bin -ms /home/alexeyche/prog/sim/runs/PoissonLayer_OptimalSTDP_ExpHennequin_0001/30_model.bin -j 8
+time_unit: i
+#-----------
+snapshot=0
+#-----------
+time=0
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=269566336
+mem_heap_B=16507014
+mem_heap_extra_B=3345386
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=2
+#-----------
+time=806988719
+mem_heap_B=20481462
+mem_heap_extra_B=7747530
+mem_stacks_B=0
+heap_tree=detailed
+n4: 20481462 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 18748000 0x4E3B819: addValueLList_SynSpike (util_dlink_list_tmpl.c:37)
+  n1: 18748000 0x4E3C40A: propagateInputSpikesNetSim (netsim.c:117)
+   n1: 18748000 0x4E3CE93: simSetInputSpikes (sim.c:35)
+    n1: 18748000 0x4E3CFE3: simSetInputSpikePatterns (sim.c:49)
+     n0: 18748000 0x401C9C: main (snn_sim.c:50)
+ n0: 1045622 in 91 places, all below massif's threshold (01.00%)
+ n1: 384000 0x4E3AFDD: insertVector_Conn (util_vector_tmpl.c:17)
+  n1: 384000 0x4E3BF75: configureConnMapNetSim (netsim.c:75)
+   n2: 384000 0x4E3A656: configureNetSpikesSim (configure.c:10)
+    n1: 384000 0x4E3CE80: simSetInputSpikes (sim.c:33)
+     n1: 384000 0x4E3CFE3: simSetInputSpikePatterns (sim.c:49)
+      n0: 384000 0x401C9C: main (snn_sim.c:50)
+    n0: 0 in 1 place, below massif's threshold (01.00%)
+ n1: 303840 0x4E45C3F: addValueLList_ind (util_dlink_list_tmpl.c:37)
+  n0: 303840 in 2 places, all below massif's threshold (01.00%)
+#-----------
+snapshot=3
+#-----------
+time=1370456519
+mem_heap_B=20490534
+mem_heap_extra_B=7753578
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=4
+#-----------
+time=1974938869
+mem_heap_B=20536590
+mem_heap_extra_B=7784282
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=5
+#-----------
+time=2564012044
+mem_heap_B=20523510
+mem_heap_extra_B=7775562
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=6
+#-----------
+time=2977019093
+mem_heap_B=20527438
+mem_heap_extra_B=7778058
+mem_stacks_B=0
+heap_tree=detailed
+n4: 20527438 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 18748000 0x4E3B819: addValueLList_SynSpike (util_dlink_list_tmpl.c:37)
+  n1: 18748000 0x4E3C40A: propagateInputSpikesNetSim (netsim.c:117)
+   n1: 18748000 0x4E3CE93: simSetInputSpikes (sim.c:35)
+    n1: 18748000 0x4E3CFE3: simSetInputSpikePatterns (sim.c:49)
+     n0: 18748000 0x401C9C: main (snn_sim.c:50)
+ n0: 1045782 in 91 places, all below massif's threshold (01.00%)
+ n1: 384000 0x4E3AFDD: insertVector_Conn (util_vector_tmpl.c:17)
+  n1: 384000 0x4E3BF75: configureConnMapNetSim (netsim.c:75)
+   n2: 384000 0x4E3A656: configureNetSpikesSim (configure.c:10)
+    n1: 384000 0x4E3CE80: simSetInputSpikes (sim.c:33)
+     n1: 384000 0x4E3CFE3: simSetInputSpikePatterns (sim.c:49)
+      n0: 384000 0x401C9C: main (snn_sim.c:50)
+    n0: 0 in 1 place, below massif's threshold (01.00%)
+ n1: 349656 0x4E45C3F: addValueLList_ind (util_dlink_list_tmpl.c:37)
+  n0: 349656 in 2 places, all below massif's threshold (01.00%)
+#-----------
+snapshot=7
+#-----------
+time=3550785780
+mem_heap_B=20557646
+mem_heap_extra_B=7797434
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=8
+#-----------
+time=4205669301
+mem_heap_B=20533078
+mem_heap_extra_B=7779162
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=9
+#-----------
+time=4790670066
+mem_heap_B=20541414
+mem_heap_extra_B=7783034
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=10
+#-----------
+time=5165188133
+mem_heap_B=20531774
+mem_heap_extra_B=7776554
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=11
+#-----------
+time=5637276598
+mem_heap_B=20539614
+mem_heap_extra_B=7780842
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=12
+#-----------
+time=6058861295
+mem_heap_B=20563910
+mem_heap_extra_B=7797066
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=13
+#-----------
+time=6505963049
+mem_heap_B=20529982
+mem_heap_extra_B=7774234
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=14
+#-----------
+time=6881429094
+mem_heap_B=20530126
+mem_heap_extra_B=7773690
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=15
+#-----------
+time=7379912097
+mem_heap_B=20531022
+mem_heap_extra_B=7774074
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=16
+#-----------
+time=7739150617
+mem_heap_B=20543726
+mem_heap_extra_B=7781370
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=17
+#-----------
+time=8270818549
+mem_heap_B=20586998
+mem_heap_extra_B=7806698
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=18
+#-----------
+time=8798232829
+mem_heap_B=20553278
+mem_heap_extra_B=7784218
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=19
+#-----------
+time=9234634490
+mem_heap_B=20561574
+mem_heap_extra_B=7787402
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=20
+#-----------
+time=9539969778
+mem_heap_B=20576310
+mem_heap_extra_B=7795306
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=21
+#-----------
+time=10014355814
+mem_heap_B=20568358
+mem_heap_extra_B=7789898
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=22
+#-----------
+time=10438432305
+mem_heap_B=20565182
+mem_heap_extra_B=7787354
+mem_stacks_B=0
+heap_tree=detailed
+n4: 20565182 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 18748000 0x4E3B819: addValueLList_SynSpike (util_dlink_list_tmpl.c:37)
+  n1: 18748000 0x4E3C40A: propagateInputSpikesNetSim (netsim.c:117)
+   n1: 18748000 0x4E3CE93: simSetInputSpikes (sim.c:35)
+    n1: 18748000 0x4E3CFE3: simSetInputSpikePatterns (sim.c:49)
+     n0: 18748000 0x401C9C: main (snn_sim.c:50)
+ n0: 1069462 in 91 places, all below massif's threshold (01.00%)
+ n1: 384000 0x4E3AFDD: insertVector_Conn (util_vector_tmpl.c:17)
+  n1: 384000 0x4E3BF75: configureConnMapNetSim (netsim.c:75)
+   n2: 384000 0x4E3A656: configureNetSpikesSim (configure.c:10)
+    n1: 384000 0x4E3CE80: simSetInputSpikes (sim.c:33)
+     n1: 384000 0x4E3CFE3: simSetInputSpikePatterns (sim.c:49)
+      n0: 384000 0x401C9C: main (snn_sim.c:50)
+    n0: 0 in 1 place, below massif's threshold (01.00%)
+ n1: 363720 0x4E45C3F: addValueLList_ind (util_dlink_list_tmpl.c:37)
+  n0: 363720 in 2 places, all below massif's threshold (01.00%)
+#-----------
+snapshot=23
+#-----------
+time=10844093020
+mem_heap_B=20601702
+mem_heap_extra_B=7811594
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=24
+#-----------
+time=11197975686
+mem_heap_B=20585550
+mem_heap_extra_B=7800826
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=25
+#-----------
+time=11734602015
+mem_heap_B=20562366
+mem_heap_extra_B=7785370
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=26
+#-----------
+time=12255186170
+mem_heap_B=20568582
+mem_heap_extra_B=7789514
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=27
+#-----------
+time=12788454490
+mem_heap_B=20561910
+mem_heap_extra_B=7785066
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=28
+#-----------
+time=13281015968
+mem_heap_B=20569854
+mem_heap_extra_B=7789722
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=29
+#-----------
+time=13650445230
+mem_heap_B=20571030
+mem_heap_extra_B=7790506
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=30
+#-----------
+time=14224608514
+mem_heap_B=20556422
+mem_heap_extra_B=7780554
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=31
+#-----------
+time=14593431003
+mem_heap_B=20559182
+mem_heap_extra_B=7781754
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=32
+#-----------
+time=15157523720
+mem_heap_B=20538774
+mem_heap_extra_B=7767722
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=33
+#-----------
+time=15520520539
+mem_heap_B=20547006
+mem_heap_extra_B=7771834
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=34
+#-----------
+time=16079348997
+mem_heap_B=20591086
+mem_heap_extra_B=7797690
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=35
+#-----------
+time=16629897348
+mem_heap_B=20598446
+mem_heap_extra_B=7802170
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=36
+#-----------
+time=16997178789
+mem_heap_B=20577790
+mem_heap_extra_B=7783050
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=37
+#-----------
+time=17431049010
+mem_heap_B=20615158
+mem_heap_extra_B=7806058
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=38
+#-----------
+time=18024658509
+mem_heap_B=20615558
+mem_heap_extra_B=7805258
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=39
+#-----------
+time=18612196207
+mem_heap_B=20619790
+mem_heap_extra_B=7805306
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=40
+#-----------
+time=18996511355
+mem_heap_B=20583718
+mem_heap_extra_B=7781258
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=41
+#-----------
+time=19378807662
+mem_heap_B=20599846
+mem_heap_extra_B=7790730
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=42
+#-----------
+time=19773588085
+mem_heap_B=20608502
+mem_heap_extra_B=7795434
+mem_stacks_B=0
+heap_tree=detailed
+n4: 20608502 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 18748000 0x4E3B819: addValueLList_SynSpike (util_dlink_list_tmpl.c:37)
+  n1: 18748000 0x4E3C40A: propagateInputSpikesNetSim (netsim.c:117)
+   n1: 18748000 0x4E3CE93: simSetInputSpikes (sim.c:35)
+    n1: 18748000 0x4E3CFE3: simSetInputSpikePatterns (sim.c:49)
+     n0: 18748000 0x401C9C: main (snn_sim.c:50)
+ n0: 1100662 in 91 places, all below massif's threshold (01.00%)
+ n1: 384000 0x4E3AFDD: insertVector_Conn (util_vector_tmpl.c:17)
+  n1: 384000 0x4E3BF75: configureConnMapNetSim (netsim.c:75)
+   n2: 384000 0x4E3A656: configureNetSpikesSim (configure.c:10)
+    n1: 384000 0x4E3CE80: simSetInputSpikes (sim.c:33)
+     n1: 384000 0x4E3CFE3: simSetInputSpikePatterns (sim.c:49)
+      n0: 384000 0x401C9C: main (snn_sim.c:50)
+    n0: 0 in 1 place, below massif's threshold (01.00%)
+ n1: 375840 0x4E45C3F: addValueLList_ind (util_dlink_list_tmpl.c:37)
+  n0: 375840 in 2 places, all below massif's threshold (01.00%)
+#-----------
+snapshot=43
+#-----------
+time=20347152993
+mem_heap_B=20590862
+mem_heap_extra_B=7783674
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=44
+#-----------
+time=20713741524
+mem_heap_B=20587854
+mem_heap_extra_B=7781242
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=45
+#-----------
+time=21077213878
+mem_heap_B=20637614
+mem_heap_extra_B=7814202
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=46
+#-----------
+time=21464010023
+mem_heap_B=20627582
+mem_heap_extra_B=7807514
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=47
+#-----------
+time=21826723095
+mem_heap_B=20634422
+mem_heap_extra_B=7812074
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=48
+#-----------
+time=22194458288
+mem_heap_B=20611670
+mem_heap_extra_B=7796906
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=49
+#-----------
+time=22575342016
+mem_heap_B=20637974
+mem_heap_extra_B=7814442
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=50
+#-----------
+time=22851048125
+mem_heap_B=20621006
+mem_heap_extra_B=7803130
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=51
+#-----------
+time=23125312154
+mem_heap_B=20599262
+mem_heap_extra_B=7788634
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=52
+#-----------
+time=23395429313
+mem_heap_B=20606726
+mem_heap_extra_B=7793610
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=53
+#-----------
+time=23666282621
+mem_heap_B=20609318
+mem_heap_extra_B=7795338
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=54
+#-----------
+time=23940144370
+mem_heap_B=20608814
+mem_heap_extra_B=7795002
+mem_stacks_B=0
+heap_tree=detailed
+n4: 20608814 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 18748000 0x4E3B819: addValueLList_SynSpike (util_dlink_list_tmpl.c:37)
+  n1: 18748000 0x4E3C40A: propagateInputSpikesNetSim (netsim.c:117)
+   n1: 18748000 0x4E3CE93: simSetInputSpikes (sim.c:35)
+    n1: 18748000 0x4E3CFE3: simSetInputSpikePatterns (sim.c:49)
+     n0: 18748000 0x401C9C: main (snn_sim.c:50)
+ n0: 1101622 in 91 places, all below massif's threshold (01.00%)
+ n1: 384000 0x4E3AFDD: insertVector_Conn (util_vector_tmpl.c:17)
+  n1: 384000 0x4E3BF75: configureConnMapNetSim (netsim.c:75)
+   n2: 384000 0x4E3A656: configureNetSpikesSim (configure.c:10)
+    n1: 384000 0x4E3CE80: simSetInputSpikes (sim.c:33)
+     n1: 384000 0x4E3CFE3: simSetInputSpikePatterns (sim.c:49)
+      n0: 384000 0x401C9C: main (snn_sim.c:50)
+    n0: 0 in 1 place, below massif's threshold (01.00%)
+ n1: 375192 0x4E45C3F: addValueLList_ind (util_dlink_list_tmpl.c:37)
+  n0: 375192 in 2 places, all below massif's threshold (01.00%)
+#-----------
+snapshot=55
+#-----------
+time=24242178776
+mem_heap_B=20605598
+mem_heap_extra_B=7792858
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=56
+#-----------
+time=24513825661
+mem_heap_B=20595470
+mem_heap_extra_B=7786106
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=57
+#-----------
+time=24783776105
+mem_heap_B=20584838
+mem_heap_extra_B=7779018
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=58
+#-----------
+time=25055732154
+mem_heap_B=20602886
+mem_heap_extra_B=7791050
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=59
+#-----------
+time=25328080551
+mem_heap_B=20601446
+mem_heap_extra_B=7790090
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=60
+#-----------
+time=25597674272
+mem_heap_B=20597294
+mem_heap_extra_B=7787322
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=61
+#-----------
+time=25649698021
+mem_heap_B=20837088
+mem_heap_extra_B=7784800
+mem_stacks_B=0
+heap_tree=peak
+n5: 20837088 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 18748000 0x4E3B819: addValueLList_SynSpike (util_dlink_list_tmpl.c:37)
+  n1: 18748000 0x4E3C40A: propagateInputSpikesNetSim (netsim.c:117)
+   n1: 18748000 0x4E3CE93: simSetInputSpikes (sim.c:35)
+    n1: 18748000 0x4E3CFE3: simSetInputSpikePatterns (sim.c:49)
+     n0: 18748000 0x401C9C: main (snn_sim.c:50)
+ n0: 1024352 in 92 places, all below massif's threshold (01.00%)
+ n1: 384000 0x4E3AFDD: insertVector_Conn (util_vector_tmpl.c:17)
+  n1: 384000 0x4E3BF75: configureConnMapNetSim (netsim.c:75)
+   n2: 384000 0x4E3A656: configureNetSpikesSim (configure.c:10)
+    n1: 384000 0x4E3CE80: simSetInputSpikes (sim.c:33)
+     n1: 384000 0x4E3CFE3: simSetInputSpikePatterns (sim.c:49)
+      n0: 384000 0x401C9C: main (snn_sim.c:50)
+    n0: 0 in 1 place, below massif's threshold (01.00%)
+ n1: 359616 0x4E45C3F: addValueLList_ind (util_dlink_list_tmpl.c:37)
+  n0: 359616 in 2 places, all below massif's threshold (01.00%)
+ n1: 321120 0x4E442BC: createMatrix (matrix.c:15)
+  n0: 321120 in 7 places, all below massif's threshold (01.00%)

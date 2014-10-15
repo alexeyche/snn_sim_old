@@ -6,7 +6,7 @@ source('./ucr_ts.R')
 source('./interpolate_ts.R')
 data_dir = '~/prog/sim'
 
-sample_size = 512
+sample_size = 120
 
 data = synth # synthetic control
 #data = starlight_curves

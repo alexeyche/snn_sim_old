@@ -4,6 +4,7 @@
 
 #include <snnlib/util/templates_clean.h>
 #define T pLConst
+#define DESTRUCT free
 #include <snnlib/util/util_vector_tmpl.c>
 
 Constants* createConstants(const char *filename) {
@@ -49,15 +50,19 @@ void deleteConstants(Constants *c) {
     free(c->res_stdp);
     free(c->preproc);
     free(c->tr_stdp);
+    free(c->wta);
+    free(c->pacemaker);
     free(c);
 }
 
 indVector* indVectorParse(const char *vals) {
     indVector *v = TEMPLATE(createVector,ind)();
-    char *token;
     char *string = strdup(vals);
-    while ((token = strsep(&string, " ")) != NULL) {
-        TEMPLATE(insertVector,ind)(v, atoi(token));
+    char *tok = string, *end = string;
+    while (tok != NULL) {
+        strsep(&end, " ");
+        TEMPLATE(insertVector,ind)(v, atoi(tok));
+        tok = end;
     }
     free(string);
     return(v);
@@ -65,36 +70,44 @@ indVector* indVectorParse(const char *vals) {
 
 doubleVector* doubleVectorParse(const char *vals) {
     doubleVector *v = TEMPLATE(createVector,double)();
-    char *token;
     char *string = strdup(vals);
-    while ((token = strsep(&string, " ")) != NULL) {
-        TEMPLATE(insertVector,double)(v, atof(token));
+    char *tok = string, *end = string;
+    while (tok != NULL) {
+        strsep(&end, " ");
+        TEMPLATE(insertVector,double)(v, atof(tok));
+        tok = end;
     }
     free(string);
     return(v);
 }             
 
-pccharVector* pccharVectorColonParse(const char *vals) {
-    pccharVector *v = TEMPLATE(createVector,pcchar)();
-    char *token;
+pcharVector* pcharVectorColonParse(const char *vals) {
+    pcharVector *v = TEMPLATE(createVector,pchar)();
     char *string = strdup(vals);
-    while ((token = strsep(&string, ":")) != NULL) {
-        TEMPLATE(insertVector,pcchar)(v, strdup(token));
+    char *tok = string, *end = string;
+    while (tok != NULL) {
+        strsep(&end, ":");
+        TEMPLATE(insertVector,pchar)(v, strdup(tok));
+        tok = end;
     }
     free(string);
     return(v);
 }
 
-pccharVector* pccharVectorParse(const char *vals) {
-    pccharVector *v = TEMPLATE(createVector,pcchar)();
-    char *token;
+pcharVector* pcharVectorParse(const char *vals) {
+    pcharVector *v = TEMPLATE(createVector,pchar)();
     char *string = strdup(vals);
-    while ((token = strsep(&string, " ")) != NULL) {
-        TEMPLATE(insertVector,pcchar)(v, strdup(token));
+    char *tok = string, *end = string;
+    while (tok != NULL) {
+        strsep(&end, " ");
+        TEMPLATE(insertVector,pchar)(v, strdup(tok));
+        tok = end;
     }
     free(string);
     return(v);
 }
+
+
 
 neuron_layer_t neuronTypeParse(char *str) {
     if(strcmp(str, "PoissonLayer") == 0) {
@@ -178,7 +191,7 @@ void fillNetEdgeProb(const char *str, LayerConstants *c) {
     c->net_edge_prob0 = 0.0;
     c->net_edge_prob1 = 0.0;
     c->net_edge_prob_group_size = c->N;
-    pccharVector *v = pccharVectorColonParse(str);    
+    pcharVector *v = pcharVectorColonParse(str);    
     if(v->size == 0) {
         printf("Too less argumnets in colon option in net_edge_prob\n");
         exit(1);
@@ -198,13 +211,14 @@ void fillNetEdgeProb(const char *str, LayerConstants *c) {
         printf("Too much argumnets in colon option in net_edge_prob\n");
         exit(1);
     }
+    TEMPLATE(deleteVector,pchar)(v);
 }
 
 void fillInputEdgeProb(const char *str, LayerConstants *c) {
     c->input_edge_prob0 = 0.0;
     c->input_edge_prob1 = 0.0;
     c->input_edge_prob_group_size = c->N;
-    pccharVector *v = pccharVectorColonParse(str);    
+    pcharVector *v = pcharVectorColonParse(str);    
 
     if(v->size == 0) {
         printf("Too less argumnets in colon option in input_edge_prob\n");
@@ -225,6 +239,7 @@ void fillInputEdgeProb(const char *str, LayerConstants *c) {
         printf("Too much argumnets in colon option in input_edge_prob\n");
         exit(1);
     }
+    TEMPLATE(deleteVector,pchar)(v);
 }
 
 #define FILL_LAYER_CONST(name,type) {       \
@@ -267,14 +282,14 @@ void fillInputEdgeProb(const char *str, LayerConstants *c) {
     } \
 
 #define FILL_HIGH_AND_LOW_PARAM(low_name, high_name) { \
-        pccharVector* v = pccharVectorColonParse(value);\
+        pcharVector* v = pcharVectorColonParse(value);\
         assert(v->size > 0);                            \
         low_name = atof(v->array[0]);   \
         high_name = low_name; \
         if(v->size > 1) {                               \
             high_name = atof(v->array[1]);  \
         }                                 \
-        TEMPLATE(deleteVector,pcchar)(v); \
+        TEMPLATE(deleteVector,pchar)(v); \
 }\
 
 int file_handler(void* user, const char* section, const char* name, const char* value) {
@@ -393,19 +408,19 @@ int file_handler(void* user, const char* section, const char* name, const char* 
         c->M = atoi(value);
     } else 
     if (MATCH("layer", "neuron_type")) {
-        FILL_LAYER_CONST_FUN(neuron_type,pcchar,neuronTypeParse)
+        FILL_LAYER_CONST_FUN(neuron_type,pchar,neuronTypeParse)
     } else 
     if (MATCH("layer", "prob_fun")) {
-        FILL_LAYER_CONST_FUN(prob_fun,pcchar,probFunTypeParse)
+        FILL_LAYER_CONST_FUN(prob_fun,pchar,probFunTypeParse)
     } else 
     if (MATCH("layer", "learning_rule")) {
-        FILL_LAYER_CONST_FUN(learning_rule,pcchar,learningRuleParse)
+        FILL_LAYER_CONST_FUN(learning_rule,pchar,learningRuleParse)
     } else 
     if (MATCH("layer", "learn")) {
-        FILL_LAYER_CONST_FUN(learn,pcchar,boolParse)
+        FILL_LAYER_CONST_FUN(learn,pchar,boolParse)
     } else 
     if (MATCH("layer", "determ")) {
-        FILL_LAYER_CONST_FUN(determ,pcchar,boolParse)
+        FILL_LAYER_CONST_FUN(determ,pchar,boolParse)
     } else 
     if (MATCH("layer", "N")) {
         FILL_LAYER_CONST(N,ind)
@@ -414,10 +429,10 @@ int file_handler(void* user, const char* section, const char* name, const char* 
         FILL_LAYER_CONST(lrate,double)
     } else 
     if (MATCH("layer", "net_edge_prob")) {
-        FILL_LAYER_CONST_FUN_ARG(net_edge_prob0,pcchar,fillNetEdgeProb)
+        FILL_LAYER_CONST_FUN_ARG(net_edge_prob0,pchar,fillNetEdgeProb)
     } else 
     if (MATCH("layer", "input_edge_prob")) {
-        FILL_LAYER_CONST_FUN_ARG(input_edge_prob0,pcchar,fillInputEdgeProb)
+        FILL_LAYER_CONST_FUN_ARG(input_edge_prob0,pchar,fillInputEdgeProb)
     } else 
     if (MATCH("layer", "output_edge_prob")) {
         FILL_LAYER_CONST(output_edge_prob,double)
