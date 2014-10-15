@@ -34,7 +34,8 @@ max_X = max(unlist(X))
 for(i in 1:length(X)) {  
     X[[i]] =  2*(X[[i]]-min_X)/(max_X-min_X)-1
 }
-select_X = c(1:50, 101:150) # two classes
+#select_X = c(1:50, 101:150) # two classes
+select_X = c(1:10, 101:110) # two classes
 #select_X = c(1)
 
 X=X[select_X] 

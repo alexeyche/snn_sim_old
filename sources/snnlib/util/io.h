@@ -10,7 +10,7 @@
 
 typedef struct FileStream {
     FILE *fd;
-    const char *fname;
+    char *fname;
 } FileStream;
 
 pMatrixVector* readMatrixList(FileStream *f, int num_to_read);

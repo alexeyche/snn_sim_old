@@ -9,8 +9,6 @@ set(SOURCES
     io.h
     matrix.c
     matrix.h
-    mem.c
-    mem.h
     spikes_list.c
     spikes_list.h
     templates_clean.h
@@ -21,7 +19,6 @@ set(SOURCES
     util.h
     util_vector.c
     util_vector.h
-
 )
 
 # add directory name to sources

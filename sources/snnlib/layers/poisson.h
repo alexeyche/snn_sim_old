@@ -13,7 +13,6 @@
 #include <snnlib/util/util_dlink_list.h>
 #include <snnlib/util/util.h>
 #include <snnlib/util/matrix.h>
-#include <snnlib/util/mem.h>
 
 #include <snnlib/layers/neuron_funcs.h>
 #include <snnlib/util/io.h>

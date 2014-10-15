@@ -97,6 +97,7 @@ void deleteSpikePatternsList(SpikePatternsList *spl) {
     deleteSpikesList(spl->sl);
     TEMPLATE(deleteVector,double)(spl->timeline);
     TEMPLATE(deleteVector,double)(spl->pattern_classes);
+    free(spl);
 }
 
 SpikePatternsList* readSpikePatternsListFromFile(const char *filename) {
@@ -104,6 +105,8 @@ SpikePatternsList* readSpikePatternsListFromFile(const char *filename) {
 
     FileStream *fs = createInputFileStream(filename);
     pMatrixVector *ml = readMatrixList(fs, 3);
+    deleteFileStream(fs);
+
     Matrix *inp_m = ml->array[0];
     spl->sl = spikesMatrixToSpikesList(inp_m);
 
@@ -118,6 +121,7 @@ SpikePatternsList* readSpikePatternsListFromFile(const char *filename) {
     for(size_t ri=0; ri<classes_m->nrow*classes_m->ncol; ri++) {
         TEMPLATE(insertVector,double)(spl->pattern_classes, classes_m->vals[ri]);
     }
+    TEMPLATE(deleteVector,pMatrix)(ml);
     return(spl);
 }
 

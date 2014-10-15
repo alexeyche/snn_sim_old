@@ -17,14 +17,12 @@ OptimalSTDP* init_OptimalSTDP(LayerPoisson *l) {
         ls->stat_B = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
         ls->stat_C = (doubleVector***) malloc( l->N*sizeof(doubleVector**));
     }
-    ls->eligibility_trace = (double*) malloc( l->N*sizeof(double));
 
     for(size_t ni=0; ni<l->N; ni++) {
         ls->learn_syn_ids[ni] = TEMPLATE(createLList,ind)();
         ls->C[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
         ls->B[ni] = 0.0;
         ls->pacc[ni] = 0;
-        ls->eligibility_trace[ni] = 0;
         for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
             ls->C[ni][con_i] = 0.0;
         }
@@ -47,6 +45,35 @@ OptimalSTDP* init_OptimalSTDP(LayerPoisson *l) {
     ls->base.saveStat = &saveStat_OptimalSTDP;
     return(ls);
 }
+
+void free_OptimalSTDP(learn_t *ls_t) {
+    OptimalSTDP *ls = (OptimalSTDP*)ls_t;
+    LayerPoisson *l = ls->base.l; 
+    for(size_t ni=0; ni<l->N; ni++) {
+        if(l->nconn[ni]>0) {
+            free(ls->C[ni]);
+        }
+        TEMPLATE(deleteLList,ind)(ls->learn_syn_ids[ni]);
+        if(l->stat->statLevel>1) {
+            TEMPLATE(deleteVector,double)(ls->stat_B[ni]);
+            for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
+                TEMPLATE(deleteVector,double)(ls->stat_C[ni][con_i]);
+            }                
+            free(ls->stat_C[ni]);
+        }
+    }
+    if(l->stat->statLevel>1) {
+        free(ls->stat_B);
+        free(ls->stat_C);
+    }
+
+    free(ls->learn_syn_ids);
+    free(ls->B);
+    free(ls->C);
+    free(ls->pacc);
+    free(ls);
+}
+
 
 void toStartValues_OptimalSTDP(learn_t *ls_t) {
     OptimalSTDP *ls = (OptimalSTDP*)ls_t; 
@@ -143,33 +170,6 @@ void resetValues_OptimalSTDP(learn_t *ls_t, const size_t *ni) {
     while( (act_node = TEMPLATE(getNextLList,ind)(ls->learn_syn_ids[ *ni ]) ) != NULL ) {
        TEMPLATE(dropNodeLList,ind)(ls->learn_syn_ids[*ni], act_node);
     }
-}
-
-void free_OptimalSTDP(learn_t *ls_t) {
-    OptimalSTDP *ls = (OptimalSTDP*)ls_t;
-    LayerPoisson *l = ls->base.l; 
-    for(size_t ni=0; ni<l->N; ni++) {
-        if(l->nconn[ni]>0) {
-            free(ls->C[ni]);
-        }
-        TEMPLATE(deleteLList,ind)(ls->learn_syn_ids[ni]);
-        if(l->stat->statLevel>1) {
-            TEMPLATE(deleteVector,double)(ls->stat_B[ni]);
-            for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
-                TEMPLATE(deleteVector,double)(ls->stat_C[ni][con_i]);
-            }                
-            free(ls->stat_C[ni]);
-        }
-    }
-    if(l->stat->statLevel>1) {
-        free(ls->stat_B);
-        free(ls->stat_C);
-    }
-
-    free(ls->learn_syn_ids);
-    free(ls->B);
-    free(ls->C);
-    free(ls);
 }
 
 void serialize_OptimalSTDP(learn_t *ls_t, FileStream *file, const Sim *s) {

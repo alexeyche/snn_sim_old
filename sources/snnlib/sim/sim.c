@@ -47,8 +47,8 @@ void simSetInputSpikes(Sim *s, SpikesList *sl) {
 
 void simSetInputSpikePatterns(Sim *s, SpikePatternsList *spl) {
     simSetInputSpikes(s, spl->sl);
-    s->rt->reset_timeline = TEMPLATE(copyVector,double)(spl->timeline);
-    s->rt->pattern_classes = TEMPLATE(copyVector,double)(spl->pattern_classes);
+    TEMPLATE(copyToVector,double)(spl->timeline, s->rt->reset_timeline);
+    TEMPLATE(copyToVector,double)(spl->pattern_classes, s->rt->pattern_classes);
 }
 
 
@@ -141,15 +141,19 @@ void runSim(Sim *s) {
         P( pthread_create( &threads[i], &attr, simRunRoutine,  &workers[i]) );
     }
     simRunRoutine(&workers[0]);
-
+    for( int i = 1; i < s->impl->nthreads; i++ )  {
+        P( pthread_join(threads[i], NULL) );
+    }
     free(workers);
     free(threads);
     for(size_t ni=0; ni<s->impl->net_size; ni++) {
         pthread_spin_destroy(&spinlocks[ni]);
     }
+    free((void*)spinlocks);
 //    if(s->c->reinforcement) {
 //        pthread_spin_destroy(global_reward_spinlock);
 //    }
+    free(s->impl->na);
 }
 
 void* simRunRoutine(void *args) {

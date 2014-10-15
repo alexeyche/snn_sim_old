@@ -16,6 +16,7 @@ SimRuntime* createRuntime() {
 
 void deleteRuntime(SimRuntime *sr) {
     TEMPLATE(deleteVector,double)(sr->reset_timeline);
+    TEMPLATE(deleteVector,double)(sr->pattern_classes);
     TEMPLATE(deleteVector,int)(sr->uniq_classes);
     TEMPLATE(deleteVector,ind)(sr->classes_indices_train);
     free(sr);

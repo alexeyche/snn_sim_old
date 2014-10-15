@@ -34,12 +34,14 @@ void TEMPLATE(deleteVector,T)(TVEC(T) *a) {
   free(a->array);
   a->array = NULL;
   a->alloc_size = a->size = 0;
+  free(a);
 }
 
 void TEMPLATE(deleteVectorNoDestroy,T)(TVEC(T) *a) {
   free(a->array);
   a->array = NULL;
   a->alloc_size = a->size = 0;
+  free(a);
 }
 
 TVEC(T)* TEMPLATE(copyFromArray,T)(T *a, size_t size) {
@@ -56,6 +58,18 @@ TVEC(T)* TEMPLATE(copyVector,T)(TVEC(T) *oldv) {
         TEMPLATE(insertVector,T)(v, oldv->array[eli]);
     }
     return(v);
+}
+
+void TEMPLATE(copyToVector,T)(TVEC(T) *oldv, TVEC(T) *newv) {
+    for(size_t eli=0; eli<oldv->size; eli++) {
+        TEMPLATE(insertVector,T)(newv, oldv->array[eli]);
+    }
+}
+
+void TEMPLATE(copyToAlloc,T)(TVEC(T) *oldv, T *alloc) {
+    for(size_t eli=0; eli<oldv->size; eli++) {
+        alloc[eli] = oldv->array[eli];
+    }
 }
 
 TVEC(T)* TEMPLATE(tailVector,T)(TVEC(T) *v, size_t n) {

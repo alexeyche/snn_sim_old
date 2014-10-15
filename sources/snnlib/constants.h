@@ -184,7 +184,7 @@ Constants* createConstants(const char *filename);
 void deleteConstants(Constants *c);
 indVector* indVectorParse(const char *vals);
 doubleVector* doubleVectorParse(const char *vals);
-pccharVector* pccharVectorParse(const char *vals);
+pcharVector* pcharVectorParse(const char *vals);
 neuron_layer_t neuronTypeParse(char *str);
 learning_rule_t learningRuleParse(char *str);
 bool boolParse(char *str);
