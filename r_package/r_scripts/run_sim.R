@@ -31,7 +31,7 @@ Tmax=max(sapply(spikes,max))+100
 
 
 #max_ep = ceiling(50*511.0/Tmax) + 1
-max_ep = 10
+max_ep = 2
 
 
 net = blank_net(N+M)

@@ -21,7 +21,7 @@ const$setValue("adex neuron", "b", 0.0)
 pl = RPrepLayer$new(const, saveStat, jobs)
 plot_tuning_curves(pl)
 
-sample_size = 120
+sample_size = 512
 
 X = vector("list",300)
 labels = loadMatrix(sprintf("~/prog/sim/ts/synthetic_control/synthetic_control_TRAIN_%s_labels",sample_size),1)
@@ -40,7 +40,7 @@ select_X = c(1:50, 101:150) # two classes
 X=X[select_X] 
 labels = labels[select_X]
 
-gap_between_patterns = 100.0 # ms
+gap_between_patterns = 0.0 # ms
 p = pl$run(X, labels, gap_between_patterns)
 
 prast(p[[1]],T0=0,Tmax=300)

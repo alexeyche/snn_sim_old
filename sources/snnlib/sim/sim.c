@@ -226,9 +226,5 @@ void* simRunRoutine(void *args) {
     return(NULL);
 }
 
-void simulateNeuron(Sim *s, const size_t *layer_id, const size_t *n_id, const double *t) {
-    const Constants *c = s->ctx->c;
-
-}
 
 

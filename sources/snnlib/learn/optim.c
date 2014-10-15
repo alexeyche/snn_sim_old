@@ -22,6 +22,7 @@ OptimalSTDP* init_OptimalSTDP(LayerPoisson *l) {
     for(size_t ni=0; ni<l->N; ni++) {
         ls->learn_syn_ids[ni] = TEMPLATE(createLList,ind)();
         ls->C[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
+        ls->B[ni] = 0.0;
         ls->pacc[ni] = 0;
         ls->eligibility_trace[ni] = 0;
         for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
@@ -35,7 +36,6 @@ OptimalSTDP* init_OptimalSTDP(LayerPoisson *l) {
             }
         }
     }
-    ls->time_passed = 0.0;
 
     ls->base.toStartValues = &toStartValues_OptimalSTDP;
     ls->base.propagateSynSpike = &propagateSynSpike_OptimalSTDP;

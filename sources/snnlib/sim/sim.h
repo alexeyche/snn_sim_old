@@ -75,7 +75,6 @@ void deleteSim(Sim *s);
 size_t getLayerIdOfNeuron(Sim *s, size_t n_id);
 
 void runSim(Sim *s);
-void simulateNeuron(Sim *s, const size_t *layer_id, const size_t *n_id, const double *t);
 const SynSpike* getInputSpike(Sim *s, const size_t *layer_id, const size_t *n_id, const double *t);
 void* simRunRoutine(void *args);
 void simSetInputSpikes(Sim *s, SpikesList *sl);

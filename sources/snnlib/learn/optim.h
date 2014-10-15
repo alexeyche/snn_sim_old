@@ -12,8 +12,6 @@ typedef struct {
     double *B;
     double *pacc;
 
-    double time_passed;
-
     doubleVector **stat_B;
     doubleVector ***stat_C;
     double *eligibility_trace;

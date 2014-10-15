@@ -63,7 +63,6 @@ void propagateSpike_Adapt(LayerPoisson *l, const size_t *ni, const SynSpike *sp,
 void toStartValues_Adapt(LayerPoisson *l, const Constants *c) {
     LayerAdapt* linh = (LayerAdapt*) l;
     toStartValues_Poisson(l, c);
-
 }
 
 void allocSynData_Adapt(LayerPoisson *l) {

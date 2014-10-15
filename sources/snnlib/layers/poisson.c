@@ -75,7 +75,6 @@ LayerPoisson* createPoissonLayer(size_t N, size_t *glob_idx, unsigned char statL
 
 void deleteLayer_Poisson(LayerPoisson *l) {
     for(size_t ni=0; ni<l->N; ni++) {
-
         TEMPLATE(deleteLList,ind)(l->active_syn_ids[ni]);
         if(l->stat->statLevel > 0) {
             TEMPLATE(deleteVector,double)(l->stat->stat_p[ni]);
