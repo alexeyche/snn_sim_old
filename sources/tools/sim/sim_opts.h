@@ -63,23 +63,23 @@ void usageSim(void) {
 
 
 
-ArgOptionsSim parseSimOptions(int argc, char **argv) {
-    ArgOptionsSim args;
-    args.jobs = 1;
-    args.const_filename = NULL;
-    args.stat_file = NULL;
-    args.model_file = NULL;
-    args.model_file_save = NULL;
-    args.model_file_load = NULL;
-    args.output_spikes_file = NULL;
-    args.input_spikes_file = NULL;
-    args.learn = -1;
-    args.seed = time(NULL);
-    args.input_port = -1;
-    args.output_port = -1;
-    args.Tmax = 0;
-    args.calcStat = false;
-    args.statLevel = 0;
+ArgOptionsSim* parseSimOptions(int argc, char **argv) {
+    ArgOptionsSim *args = (ArgOptionsSim*) malloc( sizeof(ArgOptionsSim));
+    args->jobs = 1;
+    args->const_filename = NULL;
+    args->stat_file = NULL;
+    args->model_file = NULL;
+    args->model_file_save = NULL;
+    args->model_file_load = NULL;
+    args->output_spikes_file = NULL;
+    args->input_spikes_file = NULL;
+    args->learn = -1;
+    args->seed = time(NULL);
+    args->input_port = -1;
+    args->output_port = -1;
+    args->Tmax = 0;
+    args->calcStat = false;
+    args->statLevel = 0;
     if(argc == 1) usageSim();
     while ((argc > 1) && (argv[1][0] == '-')) {
         if(strcmp(argv[1], "--stat-level") == 0) {                
@@ -87,7 +87,7 @@ ArgOptionsSim parseSimOptions(int argc, char **argv) {
                 printf("No options for --stat-level\n");
                 usageSim();
             }
-            args.statLevel = atoi(argv[2]);
+            args->statLevel = atoi(argv[2]);
             ++argv; --argc;
         } else
         if(strcmp(argv[1], "-T") == 0) {                
@@ -95,7 +95,7 @@ ArgOptionsSim parseSimOptions(int argc, char **argv) {
                 printf("No options for -T\n");
                 usageSim();
             }
-            args.Tmax = atof(argv[2]);
+            args->Tmax = atof(argv[2]);
             ++argv; --argc;
         } else
         if(strcmp(argv[1], "-m") == 0) {                
@@ -103,7 +103,7 @@ ArgOptionsSim parseSimOptions(int argc, char **argv) {
                 printf("No options for -m\n");
                 usageSim();
             }
-            args.model_file = strdup(argv[2]);
+            args->model_file = strdup(argv[2]);
             ++argv; --argc;
         } else
         if(strcmp(argv[1], "-i") == 0) {                
@@ -111,7 +111,7 @@ ArgOptionsSim parseSimOptions(int argc, char **argv) {
                 printf("No options for -i\n");
                 usageSim();
             }
-            args.input_spikes_file = strdup(argv[2]);
+            args->input_spikes_file = strdup(argv[2]);
             ++argv; --argc;
         } else
         if(strcmp(argv[1], "-ip") == 0) {                
@@ -119,7 +119,7 @@ ArgOptionsSim parseSimOptions(int argc, char **argv) {
                 printf("No options for -ip\n");
                 usageSim();
             }
-            args.input_port = atoi(argv[2]);
+            args->input_port = atoi(argv[2]);
             ++argv; --argc;
         } else
         if(strcmp(argv[1], "-op") == 0) {                
@@ -127,7 +127,7 @@ ArgOptionsSim parseSimOptions(int argc, char **argv) {
                 printf("No options for -op\n");
                 usageSim();
             }
-            args.output_port = atoi(argv[2]);
+            args->output_port = atoi(argv[2]);
             ++argv; --argc;
         } else
         if(strcmp(argv[1], "-o") == 0) {                
@@ -135,7 +135,7 @@ ArgOptionsSim parseSimOptions(int argc, char **argv) {
                 printf("No options for -o\n");
                 usageSim();
             }
-            args.output_spikes_file = strdup(argv[2]);
+            args->output_spikes_file = strdup(argv[2]);
             ++argv; --argc;
         } else
         if(strcmp(argv[1], "-ms") == 0) {                
@@ -143,7 +143,7 @@ ArgOptionsSim parseSimOptions(int argc, char **argv) {
                 printf("No options for -ms\n");
                 usageSim();
             }
-            args.model_file_save = strdup(argv[2]);
+            args->model_file_save = strdup(argv[2]);
             ++argv; --argc;
         } else
         if(strcmp(argv[1], "-ml") == 0) {                
@@ -151,7 +151,7 @@ ArgOptionsSim parseSimOptions(int argc, char **argv) {
                 printf("No options for -ml\n");
                 usageSim();
             }
-            args.model_file_load = strdup(argv[2]);
+            args->model_file_load = strdup(argv[2]);
             ++argv; --argc;
         } else
         if(strcmp(argv[1], "-c") == 0) {                
@@ -159,7 +159,7 @@ ArgOptionsSim parseSimOptions(int argc, char **argv) {
                 printf("No options for -c\n");
                 usageSim();
             }
-            args.const_filename = strdup(argv[2]);
+            args->const_filename = strdup(argv[2]);
             ++argv; --argc;
         } else
         if(strcmp(argv[1], "-j") == 0) {                
@@ -167,7 +167,7 @@ ArgOptionsSim parseSimOptions(int argc, char **argv) {
                 printf("No options for -j\n");
                 usageSim();
             }
-            args.jobs = atoi(argv[2]);
+            args->jobs = atoi(argv[2]);
             ++argv; --argc;
         } else
         if(strcmp(argv[1], "-s") == 0) {                
@@ -175,7 +175,7 @@ ArgOptionsSim parseSimOptions(int argc, char **argv) {
                 printf("No options for -s\n");
                 usageSim();
             }
-            args.stat_file = strdup(argv[2]);
+            args->stat_file = strdup(argv[2]);
             ++argv; --argc;
         } else 
         if(strcmp(argv[1], "-sc") == 0) {                
@@ -183,8 +183,8 @@ ArgOptionsSim parseSimOptions(int argc, char **argv) {
                 printf("No options for -sc\n");
                 usageSim();
             }
-            args.stat_file = strdup(argv[2]);
-            args.calcStat = true;
+            args->stat_file = strdup(argv[2]);
+            args->calcStat = true;
             ++argv; --argc;
         } else 
         if(strcmp(argv[1], "-seed") == 0) {                
@@ -192,19 +192,19 @@ ArgOptionsSim parseSimOptions(int argc, char **argv) {
                 printf("No options for -s\n");
                 usageSim();
             }
-            args.seed = atoi(argv[2]);
+            args->seed = atoi(argv[2]);
             ++argv; --argc;
         } else 
         if(strcmp(argv[1], "-l") == 0) {                
-            args.learn = 1;
+            args->learn = 1;
             if(argc == 2) { 
-                args.learn = 1;
+                args->learn = 1;
             } else
             if(strcmp(argv[2], "yes") == 0) {
-                args.learn = 1;
+                args->learn = 1;
             } else 
             if(strcmp(argv[2], "no") == 0) {
-                args.learn = 0;
+                args->learn = 0;
             }
             ++argv; --argc;
         } else
@@ -217,23 +217,23 @@ ArgOptionsSim parseSimOptions(int argc, char **argv) {
 
         ++argv; --argc;
     }
-    if(args.jobs == 0) {
+    if(args->jobs == 0) {
         printf("Jobs number is inappropriate\n");
         usageSim();
     }
-    if(args.const_filename == NULL) {
+    if(args->const_filename == NULL) {
         printf("Need const file name\n");
         usageSim();
     }
-    if((args.model_file) && ( (args.model_file_save) || (args.model_file_load))) {
+    if((args->model_file) && ( (args->model_file_save) || (args->model_file_load))) {
         printf("Doubling in options. Choose model for save or for load or for both of them\n");
         usageSim();
     }
-    if((args.input_spikes_file == NULL) && (args.input_port < 0)) {
+    if((args->input_spikes_file == NULL) && (args->input_port < 0)) {
         printf("Need something on input\n");
         usageSim();
     }
-    if((args.output_spikes_file == NULL) && (args.output_port < 0)) {
+    if((args->output_spikes_file == NULL) && (args->output_port < 0)) {
         printf("Need something on output\n");
         usageSim();
     }
