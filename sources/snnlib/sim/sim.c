@@ -47,8 +47,8 @@ void simSetInputSpikes(Sim *s, SpikesList *sl) {
 
 void simSetInputSpikePatterns(Sim *s, SpikePatternsList *spl) {
     simSetInputSpikes(s, spl->sl);
-    s->rt->reset_timeline = TEMPLATE(copyVector,double)(spl->timeline);
-    s->rt->pattern_classes = TEMPLATE(copyVector,double)(spl->pattern_classes);
+    TEMPLATE(copyToVector,double)(spl->timeline, s->rt->reset_timeline);
+    TEMPLATE(copyToVector,double)(spl->pattern_classes, s->rt->pattern_classes);
 }
 
 
@@ -147,6 +147,7 @@ void runSim(Sim *s) {
     for(size_t ni=0; ni<s->impl->net_size; ni++) {
         pthread_spin_destroy(&spinlocks[ni]);
     }
+    free((void*)spinlocks);
 //    if(s->c->reinforcement) {
 //        pthread_spin_destroy(global_reward_spinlock);
 //    }
@@ -166,30 +167,32 @@ void* simRunRoutine(void *args) {
             need_sync = true;
         }
     }
-    
+
     for(double t=0; t< s->rt->Tmax; t+=c->dt) {
 //        printf("t: %f\n",ctx->t);
-        if((t >= s->rt->reset_timeline->array[ s->rt->timeline_iter ] )&&(s->rt->timeline_iter > s->rt->reset_timeline->size)) {
-            printf("%f >= %f\n", t, s->rt->reset_timeline->array[ s->rt->timeline_iter ]);
-            s->rt->timeline_iter += 1;
-            for(size_t na_i=sw->first; na_i<sw->last; na_i++) {
-                const size_t *layer_id = &impl->na[na_i].layer_id;
-                const size_t *n_id = &impl->na[na_i].n_id;
-                LayerPoisson *l = s->layers->array[*layer_id];
-                
-                if(l->ls_t) {
-                    l->ls_t->resetValues(l->ls_t, n_id);
-                }                    
-                for(size_t con_i=0; con_i<l->nconn[ *n_id ]; con_i++) {
-                    l->syn[*n_id][con_i] = 0.0;
-                }
-                l->gr[*n_id] = 0.0;
-                l->M[*n_id] = 0.0;
-                l->u[*n_id] = 0.0;
-                l->p[*n_id] = 0.0;
-            }
-            pthread_barrier_wait( &barrier );
-        }
+//        if((t >= s->rt->reset_timeline->array[ s->rt->timeline_iter ] )&&(s->rt->timeline_iter < s->rt->reset_timeline->size)) {
+//            pthread_barrier_wait( &barrier );
+//            if(sw->thread_id == 0){
+//                s->rt->timeline_iter += 1;
+//            }
+//            for(size_t na_i=sw->first; na_i<sw->last; na_i++) {
+//                const size_t *layer_id = &impl->na[na_i].layer_id;
+//                const size_t *n_id = &impl->na[na_i].n_id;
+//                LayerPoisson *l = s->layers->array[*layer_id];
+//                
+//                if(l->ls_t) {
+//                    l->ls_t->resetValues(l->ls_t, n_id);
+//                }                    
+//                for(size_t con_i=0; con_i<l->nconn[ *n_id ]; con_i++) {
+//                    l->syn[*n_id][con_i] = 0.0;
+//                }
+//                l->gr[*n_id] = 0.0;
+//                l->M[*n_id] = 0.0;
+//                l->u[*n_id] = 0.0;
+//                l->p[*n_id] = 0.0;
+//            }
+//            pthread_barrier_wait( &barrier );
+//        }
 
         for(size_t na_i=sw->first; na_i<sw->last; na_i++) {
             const size_t *layer_id = &impl->na[na_i].layer_id;

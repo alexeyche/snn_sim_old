@@ -54,9 +54,9 @@ if [ -d "$WORK_DIR/eval" ]; then
     rm -rf "$WORK_DIR/eval"
 fi    
 mkdir "$WORK_DIR/eval"
-LO_K=5
-HI_K=100
-IT_K=5
+LO_K=2.5
+HI_K=15
+IT_K=2.5
 for i in $REPEAT_NUMBERS; do 
     MODEL_TO_LOAD_OPT=" -ml $MODEL"
     OUTPUT_SPIKES_TRAIN=$WORK_DIR/eval_output_spikes_train.bin
@@ -67,6 +67,8 @@ for i in $REPEAT_NUMBERS; do
     $SNN_SIM -c $WORK_DIR/constants.ini -i $EVALUATE -o $OUTPUT_SPIKES_TEST $MODEL_TO_LOAD_OPT -l no -j $JOBS  &>> $OUTPUT_FILE  
     if [ "$METHOD" == "svm" ]; then
         $SNN_POSTPROC -i $OUTPUT_SPIKES_TRAIN -t $OUTPUT_SPIKES_TEST -o $WORK_DIR/eval/postproc_$i -k $LO_K:$IT_K:$HI_K --svm-out &>> $OUTPUT_FILE
+
+#        $SNN_POSTPROC -i $OUTPUT_SPIKES_TRAIN -t $OUTPUT_SPIKES_TEST -o $WORK_DIR/eval/postproc_$i -k $LO_K:$IT_K:$HI_K --svm-out --ignore-first-neurons $M &>> $OUTPUT_FILE
         for k in $(seq $LO_K $IT_K $HI_K); do
             k_f=$(printf "%3.1f" $k)
             echo "Kernel = $k_f" >> $OUTPUT_FILE

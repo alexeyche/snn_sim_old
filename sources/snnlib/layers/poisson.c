@@ -100,55 +100,14 @@ void deleteLayer_Poisson(LayerPoisson *l) {
     free(l->fired);
     free(l->syn_fired);
     free(l->axon_del);
-    free(l->syn_del);
     free(l->gr);
     if(l->stat->statLevel >0) {    
         free(l->stat->stat_p);
         free(l->stat->stat_fired);
         free(l->stat->stat_u);
     }
-    free(l->stat);
     free(l);
 }
-
-void allocSynData_Poisson(LayerPoisson *l) {
-    for(size_t ni=0; ni<l->N; ni++) {
-        l->id_conns[ni] = (size_t*) malloc(l->nconn[ni]*sizeof(size_t));
-        l->W[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
-        l->syn[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
-        l->syn_spec[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
-        l->syn_fired[ni] = (unsigned char*) malloc(l->nconn[ni]*sizeof(unsigned char));
-        l->syn_del[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
-        if(l->stat->statLevel > 1) {
-            l->stat->stat_W[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
-            l->stat->stat_syn[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
-            for(size_t syn_i=0; syn_i < l->nconn[ni]; syn_i++) {
-                l->stat->stat_W[ni][syn_i] = TEMPLATE(createVector,double)();
-                l->stat->stat_syn[ni][syn_i] = TEMPLATE(createVector,double)();
-            }
-        }
-    }        
-}
-
-void deallocSynData_Poisson(LayerPoisson *l) {
-    for(size_t ni=0; ni<l->N; ni++) {
-        free(l->id_conns[ni]);
-        free(l->W[ni]);
-        free(l->syn[ni]);
-        free(l->syn_spec[ni]);
-        free(l->syn_fired[ni]);
-        free(l->syn_del[ni]);
-        if(l->stat->statLevel > 1) {
-            for(size_t syn_i=0; syn_i < l->nconn[ni]; syn_i++) {
-                TEMPLATE(deleteVector,double)(l->stat->stat_W[ni][syn_i]);
-                TEMPLATE(deleteVector,double)(l->stat->stat_syn[ni][syn_i]);
-            }
-            free(l->stat->stat_W[ni]);
-            free(l->stat->stat_syn[ni]);
-        }
-    }        
-}
-
 
 const LayerConstants* getLC(LayerPoisson *l, const Constants *c) {
     return( c->lc->array[l->id] );
@@ -258,6 +217,7 @@ void configureLayer_Poisson(LayerPoisson *l, const indVector *inputIDs, const in
             acc_prob_input_edge += delta_prob_input_edge;
         }
     }
+    
     l->allocSynData(l);
     for(size_t ni=0; ni<l->N; ni++) {
         if(l->nconn[ni]>0) {
@@ -330,7 +290,9 @@ void calculateProbability_Poisson(LayerPoisson *l, const size_t *ni, const SimCo
     l->p[*ni] = l->prob_fun(&l->u[*ni], c) * c->dt;
     l->M[*ni] = exp(-l->gr[ *ni ]);
     l->p[*ni] *= l->M[*ni];
-
+    if(l->p[*ni] < c->__pr) {
+       l->p[*ni] = c->__pr; 
+    }
     if(l->stat->statLevel > 0)  {
         TEMPLATE(insertVector,double)(l->stat->stat_u[*ni], l->u[*ni]);
         if(l->stat->statLevel > 1)  {
@@ -379,6 +341,43 @@ void calculateDynamics_Poisson(LayerPoisson *l, const size_t *ni, const SimConte
     l->gr[ *ni ] += -l->gr[ *ni ]/c->tr;
 }
 
+void allocSynData_Poisson(LayerPoisson *l) {
+    for(size_t ni=0; ni<l->N; ni++) {
+        l->id_conns[ni] = (size_t*) malloc(l->nconn[ni]*sizeof(size_t));
+        l->W[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
+        l->syn[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
+        l->syn_spec[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
+        l->syn_fired[ni] = (unsigned char*) malloc(l->nconn[ni]*sizeof(unsigned char));
+        l->syn_del[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
+        if(l->stat->statLevel > 1) {
+            l->stat->stat_W[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
+            l->stat->stat_syn[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
+            for(size_t syn_i=0; syn_i < l->nconn[ni]; syn_i++) {
+                l->stat->stat_W[ni][syn_i] = TEMPLATE(createVector,double)();
+                l->stat->stat_syn[ni][syn_i] = TEMPLATE(createVector,double)();
+            }
+        }
+    }        
+}
+
+void deallocSynData_Poisson(LayerPoisson *l) {
+    for(size_t ni=0; ni<l->N; ni++) {
+        free(l->id_conns[ni]);
+        free(l->W[ni]);
+        free(l->syn[ni]);
+        free(l->syn_spec[ni]);
+        free(l->syn_fired[ni]);
+        free(l->syn_del[ni]);
+        if(l->stat->statLevel > 1) {
+            for(size_t syn_i=0; syn_i < l->nconn[ni]; syn_i++) {
+                TEMPLATE(deleteVector,double)(l->stat->stat_W[ni][syn_i]);
+                TEMPLATE(deleteVector,double)(l->stat->stat_syn[ni][syn_i]);
+            }
+            free(l->stat->stat_W[ni]);
+            free(l->stat->stat_syn[ni]);
+        }
+    }        
+}
 
 void printLayer_Poisson(LayerPoisson *l) {
     printf("Poisson LayerPoisson, size: %zu \n", l->N);
@@ -495,11 +494,11 @@ void deserializeLayer_Poisson(LayerPoisson *l, FileStream *file, const Sim *s) {
     l->toStartValues(l, c);
     for(size_t ni=0; ni<l->N; ni++) {  // apply values
         assert(l->nconn[ni] == W_vals[ni]->size);
-
+        
         TEMPLATE(copyToAlloc,double)(W_vals[ni], l->W[ni]);
-        TEMPLATE(copyToAlloc,ind)(id_conns_vals[ni], l->id_conns[ni]); 
+        TEMPLATE(copyToAlloc,ind)(id_conns_vals[ni], l->id_conns[ni]);
         TEMPLATE(copyToAlloc,double)(syn_del_vals[ni], l->syn_del[ni]);
-
+        
         l->axon_del[ni] = getMatrixElement(axon_del, ni, 0);
 
         TEMPLATE(deleteVector,double)(W_vals[ni]);

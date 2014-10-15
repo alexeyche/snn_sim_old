@@ -36,19 +36,13 @@ lrule = get_const("learning_rule")
 
 #sp = loadMatrix(input_file,1)
 sp = loadMatrix(output_spikes,1)
-net = blank_net(nrow(sp))
-for(i in 1:length(net)) {
-    spike_elems = which(sp[i,]>0)
-    if(length(spike_elems)>0) {
-        if(sp[i,1] == 0) {
-            spikes_elems = c(1, spike_elems)
-        }
-    }
-    net[[i]] = sp[i, spike_elems]
-}
+net = getSpikesFromMatrix(sp)
+
+
+
 
 Ti=0
-Trange=512
+Trange=1024
 p1 = plot_rastl(net[(M-M+1):(M+sum(N))],T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 
 if(file.exists(sprintf("%s.bin",stat_file))) {
