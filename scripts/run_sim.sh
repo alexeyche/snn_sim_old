@@ -134,11 +134,11 @@ for EP in $EPOCHS; do
         INP_ITER=1
     fi        
     LAST_EP=$EP
+    if [ -n "$EVALUATE" ]; then
+        INPUT_FILE=$INPUT_FILES_DIR/$(echo $INPUT_FILES_BN | cut -d ' ' -f 1)
+        ./eval_model.sh -m $WORK_DIR/${LAST_EP}_model.bin -e $EVALUATE -t $INPUT_FILE -r 1 -s svm
+        mv -f $WORK_DIR/report.table.1 $WORK_DIR/report_epoch_${LAST_EP};
+    fi    
 done
-
-if [ -n "$EVALUATE" ]; then
-    INPUT_FILE=$INPUT_FILES_DIR/$(echo $INPUT_FILES_BN | cut -d ' ' -f 1)
-    ./eval_model.sh -m $WORK_DIR/${LAST_EP}_model.bin -e $EVALUATE -t $INPUT_FILE -r 1 -s srm
-fi    
 
 popd &> /dev/null

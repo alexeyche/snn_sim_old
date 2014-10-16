@@ -41,7 +41,7 @@ net = getSpikesFromMatrix(sp)
 
 
 
-Ti=0
+Ti=1
 Trange=1024
 p1 = plot_rastl(net[(M-M+1):(M+sum(N))],T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 
