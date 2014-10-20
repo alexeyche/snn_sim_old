@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+CUR_DIR=$PWD
 CWD_SCR=$(readlink -f $0)
 CWD=$(dirname $CWD_SCR)
 
@@ -11,14 +13,14 @@ SNN_POSTPROC="../build/bin/snn_postproc"
 function usage {
     echo "$0 -m MODEL -e TEST_SPIKES -t TRAIN_SPIKES -r REPEATS -s SCHEME(METHOD)"
     echo "Methods:"
-    echo -e "\tsvm"
+    echo -e "\tlinear"
     echo -e "\tspike_sort"
 }
 MODEL=
 EVALUATE=
 TRAIN_SPIKES=
 REPEATS=1
-METHOD="svm"
+METHOD="linear"
 # Enumerating options
 while getopts "m:t:e:r:s:" opt; do
     case "$opt" in
@@ -31,13 +33,17 @@ while getopts "m:t:e:r:s:" opt; do
         *) usage && exit 1 ;;
     esac
 done    
-([ -z $MODEL ] || [ -z $EVALUATE ] || [ -z $TRAIN_SPIKES ]) && usage && exit 1
-[ ! -f $MODEL ] && echo "Can't open $MODEL" && exit 1
+([ -z $EVALUATE ] || [ -z $TRAIN_SPIKES ]) && usage && exit 1
 [ ! -f $EVALUATE ] && echo "Can't open $EVALUATE" && exit 1
+[ ! -f $TRAIN_SPIKES ] && echo "Can't open $TRAIN_SPIKES" && exit 1
 
 export LC_NUMERIC="en_US.UTF-8"
 
-WORK_DIR=$(dirname $MODEL)
+if [ ! -z $MODEL ]; then
+    WORK_DIR=$(dirname $MODEL)
+else
+    WORK_DIR=$CUR_DIR
+fi
 JOBS=$(cat /proc/cpuinfo | grep processor | wc -l)
 function get_const {
     egrep -o "^$1.*=[ ]*[\/_.a-zA-Z0-9]+" $WORK_DIR/constants.ini | awk -F'=' '{ print $2}' | tr -d ' '
@@ -62,14 +68,20 @@ LO_K=2.5
 HI_K=15
 IT_K=2.5
 for i in $REPEAT_NUMBERS; do 
-    MODEL_TO_LOAD_OPT=" -ml $MODEL"
-    OUTPUT_SPIKES_TRAIN=$WORK_DIR/eval_output_spikes_train.bin
     OUTPUT_FILE="$WORK_DIR/eval_output_${i}.log"
     [ -f $OUTPUT_FILE ] && rm -f $OUTPUT_FILE
-    $SNN_SIM -c $WORK_DIR/constants.ini -i $TRAIN_SPIKES -o $OUTPUT_SPIKES_TRAIN $MODEL_TO_LOAD_OPT -l no -j $JOBS &> $OUTPUT_FILE  
-    OUTPUT_SPIKES_TEST=$WORK_DIR/eval_output_spikes_test.bin
-    $SNN_SIM -c $WORK_DIR/constants.ini -i $EVALUATE -o $OUTPUT_SPIKES_TEST $MODEL_TO_LOAD_OPT -l no -j $JOBS  &>> $OUTPUT_FILE  
-    if [ "$METHOD" == "svm" ]; then
+
+    if [ ! -z $MODEL ]; then
+        MODEL_TO_LOAD_OPT=" -ml $MODEL"
+        OUTPUT_SPIKES_TRAIN=$WORK_DIR/eval_output_spikes_train.bin
+        $SNN_SIM -c $WORK_DIR/constants.ini -i $TRAIN_SPIKES -o $OUTPUT_SPIKES_TRAIN $MODEL_TO_LOAD_OPT -l no -j $JOBS &> $OUTPUT_FILE  
+        OUTPUT_SPIKES_TEST=$WORK_DIR/eval_output_spikes_test.bin
+        $SNN_SIM -c $WORK_DIR/constants.ini -i $EVALUATE -o $OUTPUT_SPIKES_TEST $MODEL_TO_LOAD_OPT -l no -j $JOBS  &>> $OUTPUT_FILE  
+    else
+        OUTPUT_SPIKES_TRAIN=$TRAIN_SPIKES
+        OUTPUT_SPIKES_TEST=$EVALUATE
+    fi        
+    if [ "$METHOD" == "linear" ]; then
         $SNN_POSTPROC -i $OUTPUT_SPIKES_TRAIN -t $OUTPUT_SPIKES_TEST -o $WORK_DIR/eval/postproc_$i -k $LO_K:$IT_K:$HI_K --svm-out &>> $OUTPUT_FILE
 
 #        $SNN_POSTPROC -i $OUTPUT_SPIKES_TRAIN -t $OUTPUT_SPIKES_TEST -o $WORK_DIR/eval/postproc_$i -k $LO_K:$IT_K:$HI_K --svm-out --ignore-first-neurons $M &>> $OUTPUT_FILE
@@ -92,8 +104,7 @@ for i in $REPEAT_NUMBERS; do
         $SNN_POSTPROC -i $OUTPUT_SPIKES_TRAIN -t $OUTPUT_SPIKES_TEST -o $WORK_DIR/eval/postproc_$i -k 10 --ignore-first-neurons $M &>> $OUTPUT_FILE
     fi        
 done
-if [ "$METHOD" == "svm" ]; then
-
+if [ "$METHOD" == "linear" ]; then
     Rscript --no-init-file ./mean_report_table.R $WORK_DIR/report.table.* > $WORK_DIR/report.table
 elif [ "$METHOD" == "spike_sort" ]; then
     echo "pass"

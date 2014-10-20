@@ -4,10 +4,14 @@
 library(Rsnn)
 
 rundir="/home/alexeyche/prog/sim/runs"
-#rundir="/home/alexeyche/prog/sim/spear_runs"
-#runname = "PoissonLayer_TripleSTDP_ExpHennequin_0003"
 
-runname = system(sprintf("ls -t %s | head -n1", rundir),intern=TRUE)
+
+#rundir="/home/alexeyche/prog/sim/spear_runs"
+
+runname = system(sprintf("ls -t %s | sed -ne '1p'", rundir),intern=TRUE)
+
+#runname = "PoissonLayer_TripleSTDP_ExpHennequin_0003"
+#runname = "PoissonLayer_OptimalSTDP_ExpHennequin_weight_per_neuron_84.000_net_edge_prob_0.100"
 
 workdir=sprintf("%s/%s", rundir, runname)
 
@@ -16,8 +20,8 @@ for(ep in 1:1000) {
     output_spikes = sprintf("%s/%s_output_spikes.bin", workdir, ep)
     if(!file.exists(output_spikes)) { ep=ep-1; break }
 }
-#
-#ep=5
+
+#ep=2
 
 
 ep_str=""
@@ -42,7 +46,7 @@ net = getSpikesFromMatrix(sp)
 
 
 Ti=1
-Trange=1024
+Trange=440
 p1 = plot_rastl(net[(M-M+1):(M+sum(N))],T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 
 if(file.exists(sprintf("%s.bin",stat_file))) {

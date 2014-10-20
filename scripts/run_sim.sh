@@ -1,22 +1,17 @@
 #!/usr/bin/env bash
 
+
 CWD_SCR=$(readlink -f $0)
 CWD=$(dirname $CWD_SCR)
+pushd $CWD &> /dev/null
 
+. common.sh
 
 function usage {
     echo "$0 -w WORK_DIR -s -l -e EPOCHS -v TEST_SPIKES.BIN INPUT_FILE1 [INPUT_FILE2]"
 }
-function get_const_for_name {
-   grep -Eo "^$1.*=[ ]*[ \/_.a-zA-Z0-9]+" ../constants.ini | awk -F'=' '{ print $2}' | sed -e 's|^[ ]*||g' -e 's|[ ]*$||g'  | tr ' ' _
-}
 
 ulimit -c unlimited
-
-pushd $CWD &> /dev/null
-SNN_SIM="../build/bin/snn_sim"
-SNN_POSTPROC="../build/bin/snn_postproc"
-RUNS_DIR=~/prog/sim/runs
 
 INPUT_FILES=
 WORK_DIR=
@@ -26,6 +21,7 @@ LEARN="no"
 AUTO="no"
 LASTW="no"
 EVALUATE=
+EVAL_EP=1
 JOBS=$(cat /proc/cpuinfo | grep -E "processor"  | wc -l)
 
 # Enumerating options
@@ -92,7 +88,12 @@ fi
 function get_const {
     egrep -o "^$1.*=[ ]*[\/_.a-zA-Z0-9]+" $WORK_DIR/constants.ini | awk -F'=' '{ print $2}' | tr -d ' '
 }
-
+function evaluate {
+    EP=$1
+    INPUT_FILE=$INPUT_FILES_DIR/$(echo $INPUT_FILES_BN | cut -d ' ' -f 1)
+    ./eval_model.sh -m $WORK_DIR/${EP}_model.bin -e $EVALUATE -t $INPUT_FILE -r 2 -s linear 
+    mv -f $WORK_DIR/report.table $WORK_DIR/report_epoch_${EP};
+}
 
 MEAN_P_DUR=$(get_const mean_p_dur)
 TAU_AVERAGE=$(get_const tau_average)
@@ -134,11 +135,13 @@ for EP in $EPOCHS; do
         INP_ITER=1
     fi        
     LAST_EP=$EP
-    if [ -n "$EVALUATE" ]; then
-        INPUT_FILE=$INPUT_FILES_DIR/$(echo $INPUT_FILES_BN | cut -d ' ' -f 1)
-        ./eval_model.sh -m $WORK_DIR/${LAST_EP}_model.bin -e $EVALUATE -t $INPUT_FILE -r 1 -s svm
-        mv -f $WORK_DIR/report.table.1 $WORK_DIR/report_epoch_${LAST_EP};
-    fi    
+    if [ -n "$EVALUATE" ] && ( [ $(echo "$EP % $EVAL_EP" | bc) -eq 0 ] || [ $EP -eq 1 ] ); then
+        evaluate $EP
+    fi
 done
+
+if [ -n "$EVALUATE" ] && [ ! $(echo "$EP % $EVAL_EP" | bc) -eq 0 ]; then
+    evaluate $EP
+fi    
 
 popd &> /dev/null
