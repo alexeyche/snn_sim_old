@@ -29,8 +29,9 @@ typedef struct {
 
 
 struct SimContext {
-    double global_reward;
+    double global_reward; // global signal
     double mean_global_reward;
+    double harvested_reward; // system
     doubleVector *stat_global_reward;
     double sum_prob_wta;
 
@@ -67,7 +68,7 @@ typedef struct {
     int last;
 } SimWorker;
 
-
+pthread_spinlock_t global_reward_spinlock;
 
 Sim* createSim(size_t nthreads, unsigned char stat_level, Constants *c);
 void appendLayerSim(Sim *s, LayerPoisson *l);
@@ -79,5 +80,8 @@ const SynSpike* getInputSpike(Sim *s, const size_t *layer_id, const size_t *n_id
 void* simRunRoutine(void *args);
 void simSetInputSpikes(Sim *s, SpikesList *sl);
 void simSetInputSpikePatterns(Sim *s, SpikePatternsList *spl);
+
+void evalNet(Sim *s);
+
 
 #endif

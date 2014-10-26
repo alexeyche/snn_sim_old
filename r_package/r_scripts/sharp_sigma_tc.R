@@ -77,7 +77,7 @@ for(data_name in names(data)) {
     #select_X = c(1:50, 101:150) # two classes
     #select_X = c(1:50, 51:100, 101:150) # 3 classes
     #select_X = c(1:10, 101:110) # two classes, 10 from each one
-    #select_X = c(1)
+    #select_X = c(101)
     select_X = 1:length(X)
     
     X=X[select_X] 

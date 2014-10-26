@@ -14,7 +14,7 @@ function usage {
 
 
 declare -A const_name_to_values
-EXP_LEN=5
+EXP_LEN=3
 
 for v in $@; do 
     sect=$(echo $v | awk -F':' '{print $1}')

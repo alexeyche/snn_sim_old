@@ -11,6 +11,7 @@ Sim* createSim(size_t nthreads, unsigned char stat_level, Constants *c) {
     s->ctx = (SimContext*) malloc(sizeof(SimContext));
     s->ctx->c = c;
     s->ctx->global_reward = 0;
+    s->ctx->harvested_reward = 0;
     s->ctx->mean_global_reward = 0;
     s->ctx->stat_level = stat_level;
     if(s->ctx->stat_level > 0) {
@@ -123,9 +124,14 @@ void runSim(Sim *s) {
     for(size_t ni=0; ni<s->impl->net_size; ni++) {
         pthread_spin_init(&spinlocks[ni], 0); // net sim spinlock
     }
-    
+    if(s->ctx->c->reinforcement) {
+        pthread_spin_init(&global_reward_spinlock, 0);
+    }    
     pthread_t *threads = (pthread_t *) malloc( s->impl->nthreads * sizeof( pthread_t ) );
     SimWorker *workers = (SimWorker*) malloc( s->impl->nthreads * sizeof(SimWorker) );
+    if(s->impl->num_neurons < s->impl->nthreads) {
+        s->impl->nthreads = s->impl->num_neurons;
+    }
     for(size_t ti=0; ti < s->impl->nthreads; ti++) {
         workers[ti].thread_id = ti;
         workers[ti].s = s;
@@ -148,9 +154,10 @@ void runSim(Sim *s) {
         pthread_spin_destroy(&spinlocks[ni]);
     }
     free((void*)spinlocks);
-//    if(s->c->reinforcement) {
-//        pthread_spin_destroy(global_reward_spinlock);
-//    }
+    if(s->ctx->c->reinforcement) {
+        pthread_spin_destroy(&global_reward_spinlock);
+    }
+    free(s->impl->na);
 }
 
 void* simRunRoutine(void *args) {
@@ -169,31 +176,14 @@ void* simRunRoutine(void *args) {
     }
 
     for(double t=0; t< s->rt->Tmax; t+=c->dt) {
-//        printf("t: %f\n",ctx->t);
-//        if((t >= s->rt->reset_timeline->array[ s->rt->timeline_iter ] )&&(s->rt->timeline_iter < s->rt->reset_timeline->size)) {
-//            pthread_barrier_wait( &barrier );
-//            if(sw->thread_id == 0){
-//                s->rt->timeline_iter += 1;
-//            }
-//            for(size_t na_i=sw->first; na_i<sw->last; na_i++) {
-//                const size_t *layer_id = &impl->na[na_i].layer_id;
-//                const size_t *n_id = &impl->na[na_i].n_id;
-//                LayerPoisson *l = s->layers->array[*layer_id];
-//                
-//                if(l->ls_t) {
-//                    l->ls_t->resetValues(l->ls_t, n_id);
-//                }                    
-//                for(size_t con_i=0; con_i<l->nconn[ *n_id ]; con_i++) {
-//                    l->syn[*n_id][con_i] = 0.0;
-//                }
-//                l->gr[*n_id] = 0.0;
-//                l->M[*n_id] = 0.0;
-//                l->u[*n_id] = 0.0;
-//                l->p[*n_id] = 0.0;
-//            }
-//            pthread_barrier_wait( &barrier );
-//        }
-
+        if( s->rt->timeline_iter < s->rt->reset_timeline->size ) {
+            if(t >= s->rt->reset_timeline->array[ s->rt->timeline_iter ]) {
+                if(sw->thread_id == 0){
+                    s->rt->timeline_iter += 1;
+                }
+            }
+        }
+        pthread_barrier_wait( &barrier );
         for(size_t na_i=sw->first; na_i<sw->last; na_i++) {
             const size_t *layer_id = &impl->na[na_i].layer_id;
             const size_t *n_id = &impl->na[na_i].n_id;
@@ -243,6 +233,12 @@ void* simRunRoutine(void *args) {
             }
             pthread_barrier_wait( &barrier );
         }
+        if(c->reinforcement) {
+            if(sw->thread_id == 0) {
+                s->ctx->global_reward = s->ctx->harvested_reward;
+                s->ctx->harvested_reward = 0.0; 
+            } // sync in begining of cycle
+        }
     }
     if(sw->thread_id == 0) {
         s->ctx->actual_running_time += s->rt->Tmax;
@@ -250,6 +246,3 @@ void* simRunRoutine(void *args) {
     pthread_barrier_wait( &barrier );
     return(NULL);
 }
-
-
-

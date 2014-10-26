@@ -55,6 +55,10 @@ int main(int argc, char **argv) {
     if(a->Tmax > 0) {
         s->rt->Tmax = a->Tmax;
     }
+    if(c->reinforcement) {
+        configureRewardModulation(s);
+    }
+
 //    LayerPoisson *l = s->layers->array[0];
 //    l->printLayer(l);
 //    printSpikesList(s->ns->net);

@@ -195,6 +195,20 @@ void propagateSpikeNetSim(Sim *s, LayerPoisson *l, const size_t *ni, double t) {
 
         pthread_spin_unlock(&spinlocks[naffect]);
     }
+    if(s->ctx->c->reinforcement) {
+        if(l->id == s->layers->size - 1) { // if last layer
+            size_t current_pattern = s->rt->classes_indices_train->array[ s->rt->timeline_iter ];
+            if(l->fired[*ni]) {
+                pthread_spin_lock(&global_reward_spinlock);
+                if(*ni == current_pattern) {
+                    s->ctx->harvested_reward += s->ctx->c->reward_ltp;
+                } else {
+                    s->ctx->harvested_reward += s->ctx->c->reward_ltd;
+                }
+                pthread_spin_unlock(&global_reward_spinlock);
+            }
+        }
+    }
 }
 
 
