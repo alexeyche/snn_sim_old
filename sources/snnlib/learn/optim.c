@@ -17,20 +17,24 @@ OptimalSTDP* init_OptimalSTDP(LayerPoisson *l) {
         ls->stat_B = (doubleVector**) malloc( l->N*sizeof(doubleVector*));
         ls->stat_C = (doubleVector***) malloc( l->N*sizeof(doubleVector**));
     }
-
+    ls->eligibility_trace = (double**) malloc( l->N*sizeof(double**) );
     for(size_t ni=0; ni<l->N; ni++) {
         ls->learn_syn_ids[ni] = TEMPLATE(createLList,ind)();
         ls->C[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
         ls->B[ni] = 0.0;
         ls->pacc[ni] = 0;
+        ls->eligibility_trace[ni] = (double*) malloc(l->nconn[ni]*sizeof(double));
         for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
             ls->C[ni][con_i] = 0.0;
+            ls->eligibility_trace[ni][con_i] = 0.0;
         }
         if(l->stat->statLevel>1) {
             ls->stat_B[ni] = TEMPLATE(createVector,double)();
             ls->stat_C[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
+            ls->stat_eligibility_trace[ni] = (doubleVector**) malloc( l->nconn[ni]*sizeof(doubleVector*));
             for(size_t con_i=0; con_i < l->nconn[ni]; con_i++) {
                 ls->stat_C[ni][con_i] = TEMPLATE(createVector,double)();
+                ls->stat_eligibility_trace[ni][con_i] = TEMPLATE(createVector,double)();
             }
         }
     }
@@ -117,11 +121,16 @@ void trainWeightsStep_OptimalSTDP(learn_t *ls_t, const double *u, const double *
         ls->pacc[*ni] += 1;
     }
     if(s->actual_running_time >= c->mean_p_dur) {
+
         ls->B[ *ni ] = B_calc( &l->fired[ *ni ], p, &ls->pacc[ *ni ], c);
 
         indLNode *act_node = NULL;
         while( (act_node = TEMPLATE(getNextLList,ind)(ls->learn_syn_ids[ *ni ]) ) != NULL ) {
             const size_t *syn_id = &act_node->value;
+            if(c->reinforcement) {
+//                l->W[ *ni ][ *syn_id ] += ls->eligibility_trace[ *ni ][ *syn_id ] * s->global_reward;
+                l->W[ *ni ][ *syn_id ] += getLC(l,c)->lrate * ls->C[ *ni ][ *syn_id ] * s->global_reward;
+            }
 
             double p_stroke = l->prob_fun_stroke(u,c);
             double dC = C_calc( &l->fired[ *ni ], p, &p_stroke, u, M, &l->syn[ *ni ][ *syn_id ], c); // * l->syn_spec[ *ni ][ *syn_id ];
@@ -131,10 +140,11 @@ void trainWeightsStep_OptimalSTDP(learn_t *ls_t, const double *u, const double *
             double dw = getLC(l,c)->lrate*( ls->C[ *ni ][ *syn_id ]*ls->B[ *ni ] -  \
                                         getLC(l,c)->weight_decay_factor * l->syn_fired[ *ni ][ *syn_id ] * l->W[ *ni ][ *syn_id ] );
             dw = bound_grad(&l->W[ *ni ][ *syn_id ], &dw, &getLC(l,c)->wmax, c);
-//            if(l->syn_spec[*ni][*syn_id]>0) {
+            if(!c->reinforcement) {
                 l->W[ *ni ][ *syn_id ] += dw;
-//            } else {
-//            }
+            } else {
+                ls->eligibility_trace[ *ni ][ *syn_id ] += -ls->eligibility_trace[ *ni ][ *syn_id ]/c->tel + dw;
+            }
 
             
             if((fabs(ls->C[ *ni ][ *syn_id ]) < LEARN_ACT_TOL) && (fabs(dC) < LEARN_ACT_TOL)) {
@@ -155,6 +165,7 @@ void trainWeightsStep_OptimalSTDP(learn_t *ls_t, const double *u, const double *
         TEMPLATE(insertVector,double)(ls->stat_B[ *ni ], ls->B[ *ni ]);
         for(size_t con_i=0; con_i<l->nconn[ *ni ]; con_i++) {
             TEMPLATE(insertVector,double)(ls->stat_C[ *ni ][ con_i ], ls->C[ *ni ][ con_i ]);
+            TEMPLATE(insertVector,double)(ls->stat_eligibility_trace[ *ni ][ con_i ], ls->eligibility_trace[ *ni ][ con_i ]);
         }
     }        
 }
@@ -222,6 +233,9 @@ void saveStat_OptimalSTDP(learn_t *ls_t, pMatrixVector *mv) {
         for(size_t ni=0; ni < l->N; ni++) {
             Matrix *mC = vectorArrayToMatrix(ls->stat_C[ni], l->nconn[ni]);
             TEMPLATE(insertVector,pMatrix)(mv, mC);
+
+            Matrix *m_el = vectorArrayToMatrix(ls->stat_eligibility_trace[ni], l->nconn[ni]);
+            TEMPLATE(insertVector,pMatrix)(mv, m_el);
         }
     }        
 }

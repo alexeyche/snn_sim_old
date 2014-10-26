@@ -5,7 +5,7 @@ library(Rsnn)
 
 rundir="/home/alexeyche/prog/sim/runs"
 
-
+#const = RConstants$new(const_ini)
 #rundir="/home/alexeyche/prog/sim/spear_runs"
 
 runname = system(sprintf("ls -t %s | sed -ne '1p'", rundir),intern=TRUE)
@@ -49,22 +49,7 @@ Ti=1
 Trange=440
 p1 = plot_rastl(net[(M-M+1):(M+sum(N))],T0=Ti*Trange,Tmax=(Ti+1)*Trange)
 
-if(file.exists(sprintf("%s.bin",stat_file))) {
-    if(get_const("reinforcement") == "true") {
-        rew_all = c()
-        for(ep in 1:1000) {
-            stat_file = sprintf("%s/%d_stat", workdir, ep)
-            if(file.exists(sprintf("%s.bin",stat_file))) {
-                rew = loadMatrix(stat_file, 1)                
-                rew_all = c(rew_all, mean(rew[1,]))
-            } else {
-                break
-            }
-        }
-        if(!is.nan(rew_all)) {
-            plot(rew_all,type="l")
-        }
-    } else {
+if((file.exists(sprintf("%s.bin",stat_file)))&&(get_const("reinforcement") != "true") ) {
         it=1
         p = loadMatrix(stat_file, it); it=it+1
         u = loadMatrix(stat_file, it); it=it+1
@@ -116,8 +101,20 @@ if(file.exists(sprintf("%s.bin",stat_file))) {
           #plotl(dWn[syn,Tplot])
           #plotl(syns[syn,Tplot])
         }
-    }
 } else {
+    if( (file.exists(sprintf("%s.bin",stat_file)))&&(get_const("reinforcement") == "true")) {
+        rew_all = c()
+        for(ep in 1:1000) {
+            stat_file = sprintf("%s/%d_stat", workdir, ep)
+            if(file.exists(sprintf("%s.bin",stat_file))) {
+                rew = loadMatrix(stat_file, 1)                
+                rew_all = c(rew_all, mean(rew[1,]))
+            } else {
+                break
+            }
+        }
+        plot(rew_all,type="l")        
+    }
     if(lrule == "OptimalSTDP") { 
       matrix_per_layer = 8
     } else 

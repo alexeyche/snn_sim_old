@@ -156,8 +156,10 @@ void printInputSpikesQueue(NetSim *ns) {
 #define SORT_LIM 10
 #define MINIMAL_DELAY 1
 
-void propagateSpikeNetSim(Sim *s, LayerPoisson *l, const size_t *ni, double t) {
+void propagateSpikeNetSim(Sim *s, LayerPoisson *l, const size_t *local_id, double t) {
     NetSim *ns = s->ns;
+    const size_t *ni = &l->ids[ *local_id ];
+
     TEMPLATE(insertVector,double)(ns->net->list[*ni], t);
     double ax_delay = l->axon_del[getLocalNeuronId(l, ni)];
 
@@ -198,9 +200,9 @@ void propagateSpikeNetSim(Sim *s, LayerPoisson *l, const size_t *ni, double t) {
     if(s->ctx->c->reinforcement) {
         if(l->id == s->layers->size - 1) { // if last layer
             size_t current_pattern = s->rt->classes_indices_train->array[ s->rt->timeline_iter ];
-            if(l->fired[*ni]) {
+            if(l->fired[*local_id]) {
                 pthread_spin_lock(&global_reward_spinlock);
-                if(*ni == current_pattern) {
+                if(*local_id == current_pattern) {
                     s->ctx->harvested_reward += s->ctx->c->reward_ltp;
                 } else {
                     s->ctx->harvested_reward += s->ctx->c->reward_ltd;

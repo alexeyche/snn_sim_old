@@ -121,9 +121,8 @@ for EP in $EPOCHS; do
     STAT_OPT=
     if [ "$STAT_SAVE" == "yes" ]; then
         STAT_OPT="-s $WORK_DIR/${EPOCH_SFX}stat.bin --stat-level 1"
- #   elif [[ "$REINFORCEMENT" =~ "true" ]]; then
-        
-#        STAT_OPT="--stat-level 1 -s $WORK_DIR/${EPOCH_SFX}stat.bin"
+    elif [[ "$REINFORCEMENT" =~ "true" ]]; then
+        STAT_OPT="--stat-level 1 -s $WORK_DIR/${EPOCH_SFX}stat.bin"
     fi    
     INPUT_FILE=$INPUT_FILES_DIR/$(echo $INPUT_FILES_BN | cut -d ' ' -f $INP_ITER)
     $SNN_SIM -c $WORK_DIR/constants.ini -i $INPUT_FILE -o $OUTPUT_SPIKES $STAT_OPT $MODEL_TO_LOAD_OPT -ms $MODEL_FILE -j $JOBS &> $OUTPUT_FILE

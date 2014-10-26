@@ -62,7 +62,7 @@ void deleteSim(Sim *s) {
     TEMPLATE(deleteVector,pLayer)(s->layers);
     deleteNetSim(s->ns);
     deleteRuntime(s->rt);
-    if(s->ctx->stat_level > 1) {
+    if(s->ctx->stat_level > 0) {
         TEMPLATE(deleteVector,double)(s->ctx->stat_global_reward);
     }
     free(s->ctx);
@@ -202,7 +202,7 @@ void* simRunRoutine(void *args) {
                 l->calculateSpike(l, n_id, s->ctx);
                 l->calculateDynamics(l, n_id, s->ctx);
                 if(l->fired[*n_id] == 1) {
-                    propagateSpikeNetSim(s, l, &l->ids[*n_id], t);
+                    propagateSpikeNetSim(s, l, n_id, t);
                     l->fired[*n_id] = 0;
                 }
             }
@@ -227,7 +227,7 @@ void* simRunRoutine(void *args) {
 
                 l->calculateDynamics(l, n_id, s->ctx);
                 if(l->fired[*n_id] == 1) {
-                    propagateSpikeNetSim(s, l, &l->ids[*n_id], t);
+                    propagateSpikeNetSim(s, l, n_id, t);
                     l->fired[*n_id] = 0;
                 }
             }
@@ -237,6 +237,9 @@ void* simRunRoutine(void *args) {
             if(sw->thread_id == 0) {
                 s->ctx->global_reward = s->ctx->harvested_reward;
                 s->ctx->harvested_reward = 0.0; 
+                if(s->ctx->stat_level > 0) {
+                    TEMPLATE(insertVector,double)(s->ctx->stat_global_reward, s->ctx->global_reward);
+                }
             } // sync in begining of cycle
         }
     }

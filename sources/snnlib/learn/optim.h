@@ -14,7 +14,8 @@ typedef struct {
 
     doubleVector **stat_B;
     doubleVector ***stat_C;
-
+    doubleVector ***stat_eligibility_trace;
+    double **eligibility_trace;
 } OptimalSTDP;
 
 typedef struct {

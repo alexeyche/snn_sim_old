@@ -74,6 +74,10 @@ int main(int argc, char **argv) {
     if(statLevel > 0) {
         checkIdxFnameOfFile(a->stat_file);
         pMatrixVector *mv = TEMPLATE(createVector,pMatrix)();
+        if(c->reinforcement) {
+            Matrix *m_glob_rev = vectorArrayToMatrix(&s->ctx->stat_global_reward, 1);
+            TEMPLATE(insertVector,pMatrix)(mv, m_glob_rev); 
+        }
         for(size_t li=0; li < s->layers->size; li++) {
             LayerPoisson *l = s->layers->array[li];
             l->saveStat(l, mv);
