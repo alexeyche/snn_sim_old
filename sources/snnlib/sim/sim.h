@@ -68,7 +68,7 @@ typedef struct {
     int last;
 } SimWorker;
 
-pthread_spinlock_t global_reward_spinlock;
+extern pthread_spinlock_t global_reward_spinlock;
 
 Sim* createSim(size_t nthreads, unsigned char stat_level, Constants *c);
 void appendLayerSim(Sim *s, LayerPoisson *l);

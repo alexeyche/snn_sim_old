@@ -1,6 +1,7 @@
 
 #include "sim.h"
 
+pthread_spinlock_t global_reward_spinlock;
 pthread_barrier_t barrier;
 
 Sim* createSim(size_t nthreads, unsigned char stat_level, Constants *c) {
