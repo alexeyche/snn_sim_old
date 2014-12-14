@@ -35,7 +35,7 @@ public:
         }
     }
     void setStatLevel(Rcpp::IntegerVector stat_lev) {
-        for(size_t li=0; li < stat_lev.size(); li++) {
+        for(int li=0; li < stat_lev.size(); li++) {
             if(stat_lev(li) > statLevel) {
                 Rcpp::stop("Sim was created with lower statLevel. Create new one with appropriate statLevel");
             }

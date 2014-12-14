@@ -19,7 +19,7 @@ void RConstants::setValue(std::string section, std::string name, SEXP value) {
     if(TYPEOF(value) != STRSXP) {
         Rcpp::NumericVector v(value);
         std::ostringstream strs;
-        for(size_t i=0; i<v.size(); i++) {
+        for(int i=0; i<v.size(); i++) {
             if(i>= c->lc->size) {
                 std::cout << "Too many values. Add more layers \n";
                 break;

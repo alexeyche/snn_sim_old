@@ -28,6 +28,8 @@ RCPP_MODULE(snnMod) {
     Rcpp::class_<RPrepLayer>("RPrepLayer")
     .constructor<RConstants*,unsigned char, size_t>()
     .method("run", &RPrepLayer::run, "Run time series through preparation layer")
+    .method("getList", &RPrepLayer::getList, "Get an answer of population in list")
+    .method("getBinMatrix", &RPrepLayer::getBinMatrix, "Get an answer of population in binary matrix")
     .method("getResponse", &RPrepLayer::getResponse, "Run prep layer thourgh one x value for certain time_limit")
     .method("getStat", &RPrepLayer::getStat, "Get statistics")
     .method("getParams", &RPrepLayer::getParams, "Get params of tuning curves")

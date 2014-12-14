@@ -12,7 +12,7 @@ extern "C" {
 
 Rcpp::List SpikesListToRList(SpikesList *sl);
 Rcpp::List MatrixVectorToRList(pMatrixVector *mv);
-Rcpp::NumericMatrix MatrixToRMatrix(pMatrix *m);
+Rcpp::NumericMatrix MatrixToRMatrix(Matrix *m);
 Rcpp::NumericMatrix DoublesAllocToRMatrix(double **v, int *sizes, int N);
 Rcpp::NumericVector DoubleVectorToRNumericVector(doubleVector *v);
 Rcpp::List SpikePatternsListToRList(SpikePatternsList *spl);

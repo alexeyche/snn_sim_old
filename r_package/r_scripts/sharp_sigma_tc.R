@@ -8,12 +8,12 @@ saveStat = FALSE
 const = RConstants$new(const_ini)
 const$setValue("preprocess","tuning_curve", "SigmaTC")
 const$setValue("preprocess","intercept", "-1:1")
-const$setValue("preprocess","sigma", "0.02")
-const$setValue("preprocess","sigma_gain", "30")
+const$setValue("preprocess","sigma", "0.01")
+const$setValue("preprocess","sigma_gain", "4")
 const$setValue("preprocess","prob_next_sigma", 0.2)
 const$setValue("preprocess","max_curve_num", 1)
 const$setValue("preprocess","N", 100)
-const$setValue("preprocess","dt", 2)
+const$setValue("preprocess","dt", 1)
 const$setValue("adex neuron", "t_ref", 0.0)
 const$setValue("adex neuron", "slope", 0.0)
 const$setValue("adex neuron", "a", 0.0)
@@ -22,7 +22,7 @@ const$setValue("adex neuron", "b", 0.0)
 pl = RPrepLayer$new(const, saveStat, jobs)
 plot_tuning_curves(pl)
 
-sample_size = 120
+sample_size = 60
 
 train_X = list()
 train_labels = loadMatrix(sprintf("~/prog/sim/ts/synthetic_control/synthetic_control_TRAIN_%s_labels",sample_size),1)

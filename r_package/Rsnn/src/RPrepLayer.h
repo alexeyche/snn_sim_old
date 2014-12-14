@@ -17,24 +17,38 @@ public:
     RPrepLayer(RConstants *rc_, bool saveStat_, size_t nthreads_) : saveStat(saveStat_), nthreads(nthreads_), rc(rc_) {
         tc = initTuningCurves(rc->c);
         l = createAdExLayer(rc->c->preproc->N, saveStat);
+        spl = NULL;
     }
     ~RPrepLayer() {
         tc->free(tc);
         deleteAdExLayer(l);
     }
 
-    Rcpp::List run(Rcpp::List ts_data, Rcpp::NumericVector ts_labels, double gap_between_patterns = 0.0) {
+    void run(Rcpp::List ts_data, Rcpp::NumericVector ts_labels, double gap_between_patterns = 0.0) {
         doubleVector *ts_labels_snn = RNumericVectorToDoubleVector(ts_labels);        
         pMatrixVector *ts_data_snn = RListToMatrixVector(ts_data);
-
-        SpikePatternsList* spl = runNeurons(l, tc, ts_data_snn, ts_labels_snn, rc->c, gap_between_patterns);
+        
+        if(spl) deleteSpikePatternsList(spl);
+        spl = runNeurons(l, tc, ts_data_snn, ts_labels_snn, rc->c, gap_between_patterns);
         
         TEMPLATE(deleteVector,double)(ts_labels_snn);            
         TEMPLATE(deleteVector,pMatrix)(ts_data_snn);
-        Rcpp::List l = SpikePatternsListToRList(spl);
-        deleteSpikePatternsList(spl);
-
-        return(l);
+    }
+    Rcpp::List getList() {
+        if(spl) {
+            Rcpp::List l = SpikePatternsListToRList(spl);
+            return l;
+        }
+        Rcpp::stop("Need make run before getting an answer");
+    }
+    Rcpp::NumericMatrix getBinMatrix() {
+        if(spl) {
+            Matrix *m = spikesListToBinarySpikesMatrix(spl->sl);
+            Rcpp::NumericMatrix rm = MatrixToRMatrix(m);
+            deleteMatrix(m);
+            return rm;
+        }
+        Rcpp::stop("Need make run before getting an answer");
     }
     Rcpp::NumericVector getResponse(double x, double time_limit) {
         doubleVector *resp = computeResponse(tc, x, time_limit, rc->c);
@@ -84,6 +98,7 @@ private:
     RConstants *rc;
     TuningCurves *tc;
     AdExLayer *l;
+    SpikePatternsList *spl;
 };
 
 #endif

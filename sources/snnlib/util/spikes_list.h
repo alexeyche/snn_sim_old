@@ -32,5 +32,6 @@ SpikePatternsList* createSpikePatternsList(size_t n);
 SpikePatternsList* readSpikePatternsListFromFile(const char *filename);
 void deleteSpikePatternsList(SpikePatternsList *spl);
 void saveSpikePatternsListToFile(SpikePatternsList *spl, const char *filename, bool binary_spikes);
+Matrix* spikesListToBinarySpikesMatrix(SpikesList *sl);
 
 #endif
